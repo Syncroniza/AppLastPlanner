@@ -25,6 +25,11 @@ const Sidebar: React.FC = () => {
               </Link>
             </li>
             <li className="mb-2">
+              <Link to="/clientes-proyectos" className="block p-2 hover:bg-gray-700 rounded">
+                Clientes/Proyectos
+              </Link>
+            </li>
+            <li className="mb-2">
               <Link to="/personal" className="block p-2 hover:bg-gray-700 rounded">
                 Personal
               </Link>
@@ -37,11 +42,6 @@ const Sidebar: React.FC = () => {
             <li className="mb-2">
               <Link to="/ppc" className="block p-2 hover:bg-gray-700 rounded">
                 PPC
-              </Link>
-            </li>
-            <li className="mb-2">
-              <Link to="/estadisticas" className="block p-2 hover:bg-gray-700 rounded">
-                Estadísticas
               </Link>
             </li>
           </ul>

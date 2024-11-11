@@ -1,12 +1,17 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import { useAppContext } from './Context';
 import { useLocation } from 'react-router-dom';
+import Modal from './Modal'; // Asegúrate de que la ruta de importación sea correcta
+import { RestriccionesForm } from '../types/Restricciones';
 
 const ListadoRestricciones: React.FC = () => {
   const { restricciones, setRestricciones } = useAppContext();
   const location = useLocation();
   const { clienteId, proyectoId } = location.state || {}; // Extrae clienteId y proyectoId del estado de la navegación
+
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [selectedRestriccion, setSelectedRestriccion] = useState<RestriccionesForm | null>(null);
 
   // Cargar las restricciones filtradas por cliente y proyecto
   useEffect(() => {
@@ -31,6 +36,24 @@ const ListadoRestricciones: React.FC = () => {
     }
   }, [clienteId, proyectoId, setRestricciones]);
 
+  const handleEditClick = (restriccion: RestriccionesForm) => {
+    setSelectedRestriccion(restriccion);
+    setIsModalOpen(true);
+  };
+
+  const handleModalClose = () => {
+    setIsModalOpen(false);
+    setSelectedRestriccion(null);
+  };
+
+  const handleUpdate = (updatedRestriccion: RestriccionesForm) => {
+    setRestricciones((prevRestricciones) =>
+      prevRestricciones.map((restriccion) =>
+        restriccion._id === updatedRestriccion._id ? updatedRestriccion : restriccion
+      )
+    );
+  };
+
   if (!restricciones || restricciones.length === 0) {
     return <p>No hay restricciones para este cliente y proyecto.</p>;
   }
@@ -49,6 +72,7 @@ const ListadoRestricciones: React.FC = () => {
             <th className="px-4 py-2 border-b">CNC</th>
             <th className="px-4 py-2 border-b">Nueva Fecha</th>
             <th className="px-4 py-2 border-b">Status</th>
+            <th className="px-4 py-2 border-b">Acciones</th>
           </tr>
         </thead>
         <tbody>
@@ -64,10 +88,28 @@ const ListadoRestricciones: React.FC = () => {
                 {restriccion.nuevafecha ? new Date(restriccion.nuevafecha).toLocaleDateString() : ''}
               </td>
               <td className="px-4 py-2 border-b">{restriccion.status}</td>
+              <td className="px-4 py-2 border-b">
+                <button
+                  onClick={() => handleEditClick(restriccion)}
+                  className="bg-blue-500 text-white px-2 py-1 rounded hover:bg-blue-600"
+                >
+                  Editar
+                </button>
+              </td>
             </tr>
           ))}
         </tbody>
       </table>
+
+      {/* Modal de edición */}
+      {isModalOpen && (
+        <Modal
+          isOpen={isModalOpen}
+          onClose={handleModalClose}
+          restriccion={selectedRestriccion}
+          onUpdate={handleUpdate}
+        />
+      )}
     </div>
   );
 };
