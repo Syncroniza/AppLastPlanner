@@ -6,7 +6,7 @@ import { useLocation } from 'react-router-dom';
 
 const FormularioRestricciones: React.FC = () => {
   const location = useLocation();
-  const { clienteId, proyectoId } = location.state || {}; // Recibe los IDs desde la navegación
+  const { clienteId, proyectoId, clienteNombre, proyectoNombre } = location.state || {}; // Recibe los datos del cliente y proyecto
   const { equipoData } = useAppContext();
 
   const [formData, setFormData] = useState<RestriccionesForm>({
@@ -38,8 +38,8 @@ const FormularioRestricciones: React.FC = () => {
 
       const dataToSend = {
         ...formData,
-        clienteId, // Incluye el ID del cliente
-        proyectoId, // Incluye el ID del proyecto
+        clienteId, 
+        proyectoId, 
         fechacreacion: new Date(formData.fechacreacion),
         fechacompromiso: new Date(formData.fechacompromiso),
         nuevafecha: new Date(formData.nuevafecha),
@@ -73,7 +73,11 @@ const FormularioRestricciones: React.FC = () => {
 
   return (
     <div>
-      <h1 className="text-3xl font-bold mb-4">INGRESO NUEVAS RESTRICCIONES</h1>
+      {/* Título con el nombre del cliente y proyecto */}
+      <h1 className="text-3xl font-bold mb-4">
+        Crear Restricción para {clienteNombre} - Proyecto: {proyectoNombre}
+      </h1>
+
       <form onSubmit={handleSubmit} className="flex flex-wrap items-center gap-4 p-4 bg-gray-100 shadow-md w-full">
         {/* Mostrar el ID de la restricción en un campo de solo lectura */}
         {formData.id_restriccion && (

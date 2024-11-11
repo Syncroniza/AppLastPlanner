@@ -7,13 +7,11 @@ const ClienteProyectoList: React.FC = () => {
   const { clientes } = useAppContext();
   const navigate = useNavigate();
 
-  const handleCrearRestricciones = (clienteId: string, proyectoId: string) => {
-    console.log('Redirigiendo con clienteId:', clienteId, 'proyectoId:', proyectoId); // Agregar log
+  const handleCrearRestricciones = (clienteId: string, proyectoId: string, clienteNombre: string, proyectoNombre: string) => {
     navigate(`/proyectos/${proyectoId}/restricciones`, {
-      state: { clienteId, proyectoId },
+      state: { clienteId, proyectoId, clienteNombre, proyectoNombre },
     });
   };
-  
 
   return (
     <div className="p-4 bg-white shadow-md rounded-md">
@@ -28,7 +26,7 @@ const ClienteProyectoList: React.FC = () => {
                 <p><strong>Descripción:</strong> {proyecto.descripcion}</p>
                 <div className="mt-2">
                   <button
-                    onClick={() => handleCrearRestricciones(cliente._id, proyecto._id)}
+                    onClick={() => handleCrearRestricciones(cliente._id, proyecto._id, cliente.nombre, proyecto.nombre)}
                     className="mr-2 px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
                   >
                     Crear Restricciones
