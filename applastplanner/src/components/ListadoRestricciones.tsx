@@ -1,107 +1,73 @@
-import React, { useState, useEffect } from 'react';
+import React, { useEffect } from 'react';
 import axios from 'axios';
 import { useAppContext } from './Context';
-import Modal from './Modal';
-import { RestriccionesForm } from '../types/Restricciones';
+import { useLocation } from 'react-router-dom';
 
 const ListadoRestricciones: React.FC = () => {
   const { restricciones, setRestricciones } = useAppContext();
-  const [isModalOpen, setIsModalOpen] = useState(false);
-  const [selectedRestriccion, setSelectedRestriccion] = useState<RestriccionesForm | null>(null);
+  const location = useLocation();
+  const { clienteId, proyectoId } = location.state || {}; // Extrae clienteId y proyectoId del estado de la navegación
 
-  // Función para abrir el modal con la restricción seleccionada
-  const openModal = (restriccion: RestriccionesForm) => {
-    setSelectedRestriccion(restriccion);
-    setIsModalOpen(true);
-  };
-
-  // Función para cerrar el modal
-  const closeModal = () => {
-    setIsModalOpen(false);
-    setSelectedRestriccion(null);
-  };
-
-  // Manejar la actualización después de que se realice la edición en el modal
-  const handleUpdate = (updatedRestriccion: RestriccionesForm) => {
-    setRestricciones((prevRestricciones) =>
-      prevRestricciones.map((restriccion) =>
-        restriccion._id === updatedRestriccion._id ? updatedRestriccion : restriccion
-      )
-    );
-  };
-
-  // Cargar las restricciones cuando el componente se monta
+  // Cargar las restricciones filtradas por cliente y proyecto
   useEffect(() => {
     const fetchRestricciones = async () => {
       try {
-        const response = await axios.get('http://localhost:8000/restricciones/');
+        const response = await axios.get(`http://localhost:8000/restricciones`, {
+          params: {
+            clienteId,
+            proyectoId,
+          },
+        });
         setRestricciones(response.data.data);
       } catch (error) {
         console.error('Error al obtener las restricciones:', error);
       }
     };
 
-    fetchRestricciones();
-  }, [setRestricciones]);
+    if (clienteId && proyectoId) {
+      fetchRestricciones();
+    } else {
+      console.warn('clienteId o proyectoId no está presente');
+    }
+  }, [clienteId, proyectoId, setRestricciones]);
+
+  if (!restricciones || restricciones.length === 0) {
+    return <p>No hay restricciones para este cliente y proyecto.</p>;
+  }
 
   return (
     <div className="overflow-x-auto mt-4">
       <h1 className="text-3xl font-bold mb-4">LISTADO DE RESTRICCIONES</h1>
-      <div className="min-w-full overflow-hidden rounded-lg shadow-lg">
-        <table className="w-full bg-white border-collapse border border-gray-200">
-          <thead>
-            <tr className="bg-gray-100">
-              <th className="px-4 py-2 border-b text-sm font-semibold">Responsable</th>
-              <th className="px-4 py-2 border-b text-sm font-semibold">Compromiso</th>
-              <th className="px-4 py-2 border-b text-sm font-semibold hidden md:table-cell">Centro de Costo</th>
-              <th className="px-4 py-2 border-b text-sm font-semibold hidden lg:table-cell">Fecha de Creación</th>
-              <th className="px-4 py-2 border-b text-sm font-semibold hidden lg:table-cell">Fecha de Compromiso</th>
-              <th className="px-4 py-2 border-b text-sm font-semibold hidden xl:table-cell">CNC</th>
-              <th className="px-4 py-2 border-b text-sm font-semibold hidden xl:table-cell">Nueva Fecha</th>
-              <th className="px-4 py-2 border-b text-sm font-semibold">Status</th>
-              <th className="px-4 py-2 border-b text-sm font-semibold">Acciones</th>
+      <table className="min-w-full bg-white border border-gray-200">
+        <thead>
+          <tr className="bg-gray-100">
+            <th className="px-4 py-2 border-b">Responsable</th>
+            <th className="px-4 py-2 border-b">Compromiso</th>
+            <th className="px-4 py-2 border-b">Centro de Costo</th>
+            <th className="px-4 py-2 border-b">Fecha de Creación</th>
+            <th className="px-4 py-2 border-b">Fecha de Compromiso</th>
+            <th className="px-4 py-2 border-b">CNC</th>
+            <th className="px-4 py-2 border-b">Nueva Fecha</th>
+            <th className="px-4 py-2 border-b">Status</th>
+          </tr>
+        </thead>
+        <tbody>
+          {restricciones.map((restriccion) => (
+            <tr key={restriccion._id} className="hover:bg-gray-50">
+              <td className="px-4 py-2 border-b">{restriccion.responsable}</td>
+              <td className="px-4 py-2 border-b">{restriccion.compromiso}</td>
+              <td className="px-4 py-2 border-b">{restriccion.centrocosto}</td>
+              <td className="px-4 py-2 border-b">{new Date(restriccion.fechacreacion).toLocaleDateString()}</td>
+              <td className="px-4 py-2 border-b">{new Date(restriccion.fechacompromiso).toLocaleDateString()}</td>
+              <td className="px-4 py-2 border-b">{restriccion.cnc}</td>
+              <td className="px-4 py-2 border-b">
+                {restriccion.nuevafecha ? new Date(restriccion.nuevafecha).toLocaleDateString() : ''}
+              </td>
+              <td className="px-4 py-2 border-b">{restriccion.status}</td>
             </tr>
-          </thead>
-          <tbody>
-            {restricciones.map((restriccion) => (
-              <tr key={restriccion._id} className="hover:bg-gray-50">
-                <td className="px-4 py-2 border-b text-sm">{restriccion.responsable}</td>
-                <td className="px-4 py-2 border-b text-sm">{restriccion.compromiso}</td>
-                <td className="px-4 py-2 border-b text-sm hidden md:table-cell">{restriccion.centrocosto}</td>
-                <td className="px-4 py-2 border-b text-sm hidden lg:table-cell">
-                  {new Date(restriccion.fechacreacion).toLocaleDateString()}
-                </td>
-                <td className="px-4 py-2 border-b text-sm hidden lg:table-cell">
-                  {new Date(restriccion.fechacompromiso).toLocaleDateString()}
-                </td>
-                <td className="px-4 py-2 border-b text-sm hidden xl:table-cell">{restriccion.cnc}</td>
-                <td className="px-4 py-2 border-b text-sm hidden xl:table-cell">
-                  {new Date(restriccion.nuevafecha).toLocaleDateString()}
-                </td>
-                <td className="px-4 py-2 border-b text-sm">{restriccion.status}</td>
-                <td className="px-4 py-2 border-b text-sm">
-                  <button
-                    onClick={() => openModal(restriccion)}
-                    className="px-2 py-1 bg-blue-500 text-white rounded hover:bg-blue-600"
-                  >
-                    Editar
-                  </button>
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
-
-      {/* Renderizar el modal si está abierto */}
-      {isModalOpen && selectedRestriccion && (
-        <Modal
-          isOpen={isModalOpen}
-          onClose={closeModal}
-          restriccion={selectedRestriccion}
-          onUpdate={handleUpdate}
-        />
-      )}
+          ))}
+        </tbody>
+      </table>
     </div>
   );
 };

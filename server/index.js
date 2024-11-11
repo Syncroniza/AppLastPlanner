@@ -4,6 +4,8 @@ import mongoConnect from "./config/mongo.config.js";
 import "dotenv/config";
 import equipoRoutes from "./routes/equipo.routes.js";
 import restriccioesRoutes from "./routes/restricciones.routes.js";
+import clienteRoutes from "./routes/clientes.routes.js";
+import proyectoRoutes from "./routes/proyecto.routes.js";
 const app = express();
 // app.use("/uploads", express.static("server/uploads"));
 
@@ -37,6 +39,8 @@ const PORT = process.env.PORT || 8000;
 
  equipoRoutes(app);
  restriccioesRoutes(app);
+ clienteRoutes(app);
+ proyectoRoutes(app);
 
 
 app.get("/health", (req, res) => {

@@ -2,12 +2,15 @@ import React, { useState } from 'react';
 import axios from 'axios';
 import { RestriccionesForm } from '../types/Restricciones';
 import { useAppContext } from '../components/Context';
+import { useLocation } from 'react-router-dom';
 
 const FormularioRestricciones: React.FC = () => {
+  const location = useLocation();
+  const { clienteId, proyectoId } = location.state || {}; // Recibe los IDs desde la navegación
   const { equipoData } = useAppContext();
 
   const [formData, setFormData] = useState<RestriccionesForm>({
-    id_restriccion: '', // El ID se mostrará aquí después de la creación
+    id_restriccion: '',
     responsable: '',
     compromiso: '',
     centrocosto: '',
@@ -28,8 +31,15 @@ const FormularioRestricciones: React.FC = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
+      if (!clienteId || !proyectoId) {
+        console.error('clienteId o proyectoId no están definidos.');
+        return;
+      }
+
       const dataToSend = {
         ...formData,
+        clienteId, // Incluye el ID del cliente
+        proyectoId, // Incluye el ID del proyecto
         fechacreacion: new Date(formData.fechacreacion),
         fechacompromiso: new Date(formData.fechacompromiso),
         nuevafecha: new Date(formData.nuevafecha),
@@ -39,14 +49,10 @@ const FormularioRestricciones: React.FC = () => {
       console.log('Datos enviados correctamente:', response.data);
 
       if (response.status === 201 || response.status === 200) {
-        // Verifica si `data` es un array y obtiene el último elemento
-        const createdId = response.data.data?.[response.data.data.length - 1]?.id_restriccion || '';
-
+        const createdId = response.data.data?.id_restriccion || '';
         if (createdId) {
-          console.log('ID creado:', createdId);
-          // Actualiza formData para mostrar el ID generado
           setFormData({
-            id_restriccion: createdId, // Muestra el ID creado en el formulario
+            id_restriccion: createdId,
             responsable: '',
             compromiso: '',
             centrocosto: '',
@@ -58,8 +64,6 @@ const FormularioRestricciones: React.FC = () => {
             nuevafecha: '',
             aliases: [''],
           });
-        } else {
-          console.warn('No se encontró un ID en la respuesta.');
         }
       }
     } catch (error) {
@@ -69,7 +73,7 @@ const FormularioRestricciones: React.FC = () => {
 
   return (
     <div>
-      <h1 className="text-3xl font-bold mb-4">INGRESO NUEVAS RESTRICCIONES </h1>
+      <h1 className="text-3xl font-bold mb-4">INGRESO NUEVAS RESTRICCIONES</h1>
       <form onSubmit={handleSubmit} className="flex flex-wrap items-center gap-4 p-4 bg-gray-100 shadow-md w-full">
         {/* Mostrar el ID de la restricción en un campo de solo lectura */}
         {formData.id_restriccion && (

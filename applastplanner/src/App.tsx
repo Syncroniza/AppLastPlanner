@@ -4,8 +4,9 @@ import Sidebar from './components/SideBar';
 import Home from './pages/Home';
 import Personal from './pages/Personal';
 import Restricciones from './pages/Restricciones';
-import PPC from "./pages/PPC"
+import PPC from './pages/PPC';
 import Estadisticas from './pages/Estadisticas';
+import ClienteProyectoList from './components/ClienteProyectoList';
 import { AppProvider } from './components/Context';
 
 const App: React.FC = () => {
@@ -21,12 +22,14 @@ const App: React.FC = () => {
               <Route path="/restricciones" element={<Restricciones />} />
               <Route path="/ppc" element={<PPC />} />
               <Route path="/estadisticas" element={<Estadisticas />} />
+              <Route path="/clientes-proyectos" element={<ClienteProyectoList />} />
+              <Route path="/proyectos/:proyectoId/restricciones" element={<Restricciones />} />
+              <Route path="/proyectos/:proyectoId/personal" element={<Personal />} />
             </Routes>
           </div>
         </div>
       </Router>
     </AppProvider>
-      
   );
 };
 

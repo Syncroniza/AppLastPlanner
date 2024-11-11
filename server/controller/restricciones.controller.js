@@ -1,56 +1,105 @@
 import { Types, Error } from "mongoose";
 const { ObjectId } = Types;
 import { RestriccionesModel } from "../models/restricciones.models.js";
+import {ClienteModel} from "../models/cliente.models.js"
+import {ProyectoModel}from "../models/proyecto.models.js"
 
 export function getAllRestriciones(req, res) {
-  console.log("Solicitud recibida en /desglosegg/");
-  RestriccionesModel.find({})
+  const { proyectoId, clienteId } = req.query; // Obtener proyectoId y clienteId de los query params
+
+  const filter = {};
+  if (proyectoId && ObjectId.isValid(proyectoId)) {
+    filter.proyecto = proyectoId;
+  }
+  if (clienteId && ObjectId.isValid(clienteId)) {
+    filter.cliente = clienteId;
+  }
+
+  RestriccionesModel.find(filter)
     .then((data) => {
       console.log("Datos obtenidos:", data);
       if (data.length === 0) {
-        return res.status(404).json({ message: "No se encontraron datos" });
+        return res.status(404).json({ message: "No se encontraron restricciones" });
       }
       res.json({ data });
     })
     .catch((error) => {
-      console.error("Error al obtener los datos:", error);
+      console.error("Error al obtener las restricciones:", error);
       res.status(500).json({ error: error.message || error });
     });
 }
 
-export function getOneRestricciores(req, res) {
-  let id = req.params.id;
-  if (!ObjectId.isValid(id))
-    return res
-      .status(400)
-      .json({ message: "id doesn't match the expected format" });
-  RestriccionesModel.findOne({ _id: id })
+
+export function getOneRestricciones(req, res) {
+  const proyectoId = req.params.proyectoId;
+  if (!ObjectId.isValid(proyectoId)) {
+    return res.status(400).json({ message: "El ID del proyecto no es válido" });
+  }
+
+  RestriccionesModel.find({ proyecto: proyectoId })
+    .populate('proyecto') // Población del proyecto
+    .populate('cliente')  // Población del cliente
     .then((data) => {
-      res.json({ data: data });
+      if (data.length === 0) {
+        return res.status(404).json({ message: "No se encontraron restricciones para este proyecto" });
+      }
+      res.json({ data });
     })
     .catch((error) => {
-      res.status(500).json({ error: error });
+      console.error("Error al obtener restricciones por proyecto:", error);
+      res.status(500).json({ error: error.message || error });
     });
 }
+
+
 export async function createRestricciones(req, res) {
   try {
+    const { clienteId, proyectoId, ...rest } = req.body;
+
+    // Logs de depuración para verificar los IDs recibidos
+    console.log("Cliente ID recibido:", clienteId);
+    console.log("Proyecto ID recibido:", proyectoId);
+
+    // Verifica si el cliente existe
+    const cliente = await ClienteModel.findById(clienteId);
+    if (!cliente) {
+      console.log("Cliente no encontrado con ID:", clienteId); // Log de depuración
+      return res.status(404).json({ message: "Cliente no encontrado" });
+    }
+    console.log("Cliente encontrado:", cliente); // Log de depuración
+
+    // Verifica si el proyecto existe
+    const proyecto = await ProyectoModel.findById(proyectoId);
+    if (!proyecto) {
+      console.log("Proyecto no encontrado con ID:", proyectoId); // Log de depuración
+      return res.status(404).json({ message: "Proyecto no encontrado" });
+    }
+    console.log("Proyecto encontrado:", proyecto); // Log de depuración
+
+    // Verifica si el proyecto pertenece al cliente (opcional)
+    if (!proyecto.clienteId.equals(cliente._id)) {
+      console.log(`El proyecto con ID ${proyectoId} no pertenece al cliente con ID ${clienteId}`); // Log de depuración
+      return res.status(400).json({ message: "El proyecto no pertenece al cliente proporcionado" });
+    }
+
     // Encuentra el último documento y genera un nuevo ID basado en él
-    const lastRestriccion = await RestriccionesModel.findOne()
-      .sort({ id_restriccion: -1 })
-      .exec();
+    const lastRestriccion = await RestriccionesModel.findOne().sort({ id_restriccion: -1 }).exec();
     const newNumber = lastRestriccion
       ? parseInt(lastRestriccion.id_restriccion.split("-")[1], 10) + 1
       : 101;
     const newId = `R-${newNumber}`;
 
-    // Crea la nueva restricción
+    // Crea la nueva restricción con referencia a cliente y proyecto
     const nuevaRestriccion = new RestriccionesModel({
       id_restriccion: newId,
-      ...req.body,
+      cliente: clienteId,
+      proyecto: proyectoId,
+      ...rest,
     });
 
     const savedRestriccion = await nuevaRestriccion.save();
-    res.status(201).json({ data: savedRestriccion }); // Devuelve la restricción con el ID creado
+    console.log("Restricción creada con éxito:", savedRestriccion); // Log de depuración
+    res.status(201).json({ data: savedRestriccion });
   } catch (error) {
     console.error("Error al crear la restricción:", error);
     res.status(500).json({ error: "Error al crear la restricción" });
