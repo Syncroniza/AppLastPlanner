@@ -16,9 +16,20 @@ const Modal: React.FC<ModalProps> = ({ isOpen, onClose, restriccion, onUpdate })
 
   useEffect(() => {
     if (restriccion) {
-      setFormData(restriccion); // Inicializa el estado del formulario con la restricción seleccionada
+      setFormData({
+        ...restriccion,
+        fechacreacion: restriccion.fechacreacion ? adjustDateToLocalTime(restriccion.fechacreacion) : '',
+        fechacompromiso: restriccion.fechacompromiso ? adjustDateToLocalTime(restriccion.fechacompromiso) : '',
+        nuevafecha: restriccion.nuevafecha ? adjustDateToLocalTime(restriccion.nuevafecha) : '',
+      });
     }
   }, [restriccion]);
+
+  const adjustDateToLocalTime = (dateString: string) => {
+    const date = new Date(dateString);
+    date.setMinutes(date.getMinutes() - date.getTimezoneOffset());
+    return date.toISOString().split('T')[0];
+  };
 
   if (!isOpen || !formData) return null;
 
@@ -30,13 +41,18 @@ const Modal: React.FC<ModalProps> = ({ isOpen, onClose, restriccion, onUpdate })
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
-      const response = await axios.patch(`http://localhost:8000/restricciones/${formData._id}/`, formData);
+      // Ajustar las fechas para enviarlas al backend sin problemas de zona horaria
+      const adjustedData = {
+        ...formData,
+        fechacreacion: formData.fechacreacion ? new Date(`${formData.fechacreacion}T00:00:00`).toISOString() : null,
+        fechacompromiso: formData.fechacompromiso ? new Date(`${formData.fechacompromiso}T00:00:00`).toISOString() : null,
+        nuevafecha: formData.nuevafecha ? new Date(`${formData.nuevafecha}T00:00:00`).toISOString() : null,
+      };
+
+      const response = await axios.patch(`http://localhost:8000/restricciones/${formData._id}/`, adjustedData);
       if (response.status === 200) {
-        // Actualiza el contexto global con la restricción modificada
         setRestricciones((prevRestricciones) =>
-          prevRestricciones.map((restriccion) =>
-            restriccion._id === formData._id ? formData : restriccion
-          )
+          prevRestricciones.map((r) => (r._id === formData._id ? formData : r))
         );
         onUpdate(formData);
         onClose(); // Cierra el modal después de actualizar
@@ -51,7 +67,6 @@ const Modal: React.FC<ModalProps> = ({ isOpen, onClose, restriccion, onUpdate })
       <div className="bg-white p-6 rounded shadow-lg">
         <h2 className="text-lg font-semibold mb-4">Editar Restricción</h2>
         <form onSubmit={handleSubmit} className="space-y-4">
-          {/* Dropdown para el campo de responsable cargado desde equipoData */}
           <div>
             <label className="text-sm font-medium">Responsable</label>
             <select
@@ -69,7 +84,6 @@ const Modal: React.FC<ModalProps> = ({ isOpen, onClose, restriccion, onUpdate })
             </select>
           </div>
 
-          {/* Otros campos del formulario */}
           {['compromiso', 'centrocosto', 'cnc'].map((field) => (
             <div key={field}>
               <label className="text-sm font-medium capitalize">{field}</label>
@@ -82,20 +96,20 @@ const Modal: React.FC<ModalProps> = ({ isOpen, onClose, restriccion, onUpdate })
               />
             </div>
           ))}
+
           {['fechacreacion', 'fechacompromiso', 'nuevafecha'].map((field) => (
             <div key={field}>
               <label className="text-sm font-medium capitalize">{field}</label>
               <input
                 type="date"
                 name={field}
-                value={(formData as any)[field]?.split('T')[0] || ''}
+                value={(formData as any)[field] || ''}
                 onChange={handleChange}
                 className="w-full border border-gray-300 rounded p-2"
               />
             </div>
           ))}
 
-          {/* Dropdown para el campo de status */}
           <div>
             <label className="text-sm font-medium">Status</label>
             <select
