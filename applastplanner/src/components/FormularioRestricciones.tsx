@@ -6,8 +6,8 @@ import { useLocation } from 'react-router-dom';
 
 const FormularioRestricciones: React.FC = () => {
   const location = useLocation();
-  const { clienteId, proyectoId, clienteNombre, proyectoNombre } = location.state || {}; // Recibe los datos del cliente y proyecto
-  const { equipoData } = useAppContext();
+  const { clienteId, proyectoId, clienteNombre, proyectoNombre } = location.state || {}; 
+  const { equipoData, setRestricciones } = useAppContext();
 
   const [formData, setFormData] = useState<RestriccionesForm>({
     id_restriccion: '',
@@ -28,6 +28,11 @@ const FormularioRestricciones: React.FC = () => {
     setFormData({ ...formData, [name]: value });
   };
 
+  const adjustDateForTimezone = (dateString: string) => {
+    const date = new Date(dateString);
+    return new Date(date.getTime() + date.getTimezoneOffset() * 60000).toISOString().split('T')[0];
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
@@ -40,31 +45,29 @@ const FormularioRestricciones: React.FC = () => {
         ...formData,
         clienteId, 
         proyectoId, 
-        fechacreacion: new Date(formData.fechacreacion),
-        fechacompromiso: new Date(formData.fechacompromiso),
-        nuevafecha: new Date(formData.nuevafecha),
+        fechacreacion: formData.fechacreacion ? adjustDateForTimezone(formData.fechacreacion) : '',
+        fechacompromiso: formData.fechacompromiso ? adjustDateForTimezone(formData.fechacompromiso) : '',
+        nuevafecha: formData.nuevafecha ? adjustDateForTimezone(formData.nuevafecha) : '',
       };
 
       const response = await axios.post('http://localhost:8000/restricciones/', dataToSend);
       console.log('Datos enviados correctamente:', response.data);
 
       if (response.status === 201 || response.status === 200) {
-        const createdId = response.data.data?.id_restriccion || '';
-        if (createdId) {
-          setFormData({
-            id_restriccion: createdId,
-            responsable: '',
-            compromiso: '',
-            centrocosto: '',
-            fechacreacion: '',
-            fechacompromiso: '',
-            status: '',
-            observaciones: '',
-            cnc: '',
-            nuevafecha: '',
-            aliases: [''],
-          });
-        }
+        setRestricciones((prev) => [...prev, response.data.data]);
+        setFormData({
+          id_restriccion: '',
+          responsable: '',
+          compromiso: '',
+          centrocosto: '',
+          fechacreacion: '',
+          fechacompromiso: '',
+          status: '',
+          observaciones: '',
+          cnc: '',
+          nuevafecha: '',
+          aliases: [''],
+        });
       }
     } catch (error) {
       console.error('Error al enviar los datos:', error);
@@ -73,13 +76,11 @@ const FormularioRestricciones: React.FC = () => {
 
   return (
     <div>
-      {/* Título con el nombre del cliente y proyecto */}
       <h1 className="text-3xl font-bold mb-4">
         Crear Restricción para {clienteNombre} - Proyecto: {proyectoNombre}
       </h1>
 
       <form onSubmit={handleSubmit} className="flex flex-wrap items-center gap-4 p-4 bg-gray-100 shadow-md w-full">
-        {/* Mostrar el ID de la restricción en un campo de solo lectura */}
         {formData.id_restriccion && (
           <div className="flex flex-col w-full sm:w-1/2 md:w-1/3 lg:w-1/4">
             <label className="text-xs font-semibold">ID de Restricción</label>
@@ -93,7 +94,6 @@ const FormularioRestricciones: React.FC = () => {
           </div>
         )}
 
-        {/* Campo de selección de responsable */}
         <div className="flex flex-col w-full sm:w-1/2 md:w-1/3 lg:w-1/4">
           <label className="text-xs font-semibold">Responsable</label>
           <select
@@ -111,7 +111,6 @@ const FormularioRestricciones: React.FC = () => {
           </select>
         </div>
 
-        {/* Otros campos del formulario */}
         {[
           { label: 'Compromiso', name: 'compromiso' },
           { label: 'Centro de Costo', name: 'centrocosto' },
@@ -141,7 +140,6 @@ const FormularioRestricciones: React.FC = () => {
         </button>
       </form>
 
-      {/* Mostrar el ID creado si existe */}
       {formData.id_restriccion && (
         <div className="mt-4">
           <p className="text-green-600 font-semibold">

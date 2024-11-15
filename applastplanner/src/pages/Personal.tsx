@@ -50,18 +50,18 @@ const PersonalTable: React.FC = () => {
         </tr>
       </thead>
       <tbody className="divide-y divide-gray-200">
-        {equipoData.map((personal) => (
-          <tr key={personal.id} className="hover:bg-gray-50">
-            <td className="px-4 py-2 border-r border-gray-300">{personal.id}</td>
-            <td className="px-4 py-2 border-r border-gray-300">{personal.nombre}</td>
-            <td className="px-4 py-2 border-r border-gray-300">{personal.apellido}</td>
-            <td className="px-4 py-2 border-r border-gray-300">{personal.empresa}</td>
-            <td className="px-4 py-2 border-r border-gray-300">{personal.telefono}</td>
-            <td className="px-4 py-2 border-r border-gray-300">{personal.correo}</td>
-            <td className="px-4 py-2">{personal.cargo}</td>
-          </tr>
-        ))}
-      </tbody>
+  {equipoData.map((personal, index) => (
+    <tr key={personal.id || index} className="hover:bg-gray-50">
+      <td className="px-4 py-2 border-r border-gray-300">{index + 1}</td> {/* ID correlativo */}
+      <td className="px-4 py-2 border-r border-gray-300">{personal.nombre}</td>
+      <td className="px-4 py-2 border-r border-gray-300">{personal.apellido}</td>
+      <td className="px-4 py-2 border-r border-gray-300">{personal.empresa}</td>
+      <td className="px-4 py-2 border-r border-gray-300">{personal.telefono}</td>
+      <td className="px-4 py-2 border-r border-gray-300">{personal.correo}</td>
+      <td className="px-4 py-2">{personal.cargo}</td>
+    </tr>
+  ))}
+</tbody>
     </table>
     </div>
   );

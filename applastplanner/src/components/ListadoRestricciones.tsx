@@ -13,6 +13,8 @@ const ListadoRestricciones: React.FC = () => {
 
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedRestriccion, setSelectedRestriccion] = useState<RestriccionesForm | null>(null);
+  const [sortConfig, setSortConfig] = useState<{ key: string; direction: 'asc' | 'desc' } | null>(null);
+  const [refreshKey, setRefreshKey] = useState(0); // Estado para forzar la re-renderización
 
   // Cargar las restricciones filtradas por cliente y proyecto
   useEffect(() => {
@@ -42,7 +44,35 @@ const ListadoRestricciones: React.FC = () => {
       console.warn('clienteId o proyectoId no está presente');
       setRestricciones([]);
     }
-  }, [clienteId, proyectoId, setRestricciones]);
+  }, [clienteId, proyectoId, setRestricciones, refreshKey]); // Agrega refreshKey como dependencia
+
+  // Función para manejar el clic de ordenar
+  const handleSort = (key: string) => {
+    let direction: 'asc' | 'desc' = 'asc';
+    if (sortConfig && sortConfig.key === key && sortConfig.direction === 'asc') {
+      direction = 'desc';
+    }
+    setSortConfig({ key, direction });
+  };
+
+  // Ordena las restricciones basadas en sortConfig
+  const sortedRestricciones = React.useMemo(() => {
+    if (!sortConfig) return restricciones;
+
+    return [...restricciones].sort((a, b) => {
+      if (sortConfig.key === 'fechacreacion' || sortConfig.key === 'fechacompromiso' || sortConfig.key === 'nuevafecha') {
+        const dateA = new Date(a[sortConfig.key as keyof RestriccionesForm] as string);
+        const dateB = new Date(b[sortConfig.key as keyof RestriccionesForm] as string);
+        return sortConfig.direction === 'asc' ? dateA.getTime() - dateB.getTime() : dateB.getTime() - dateA.getTime();
+      } else {
+        const valueA = (a[sortConfig.key as keyof RestriccionesForm] as string).toLowerCase();
+        const valueB = (b[sortConfig.key as keyof RestriccionesForm] as string).toLowerCase();
+        if (valueA < valueB) return sortConfig.direction === 'asc' ? -1 : 1;
+        if (valueA > valueB) return sortConfig.direction === 'asc' ? 1 : -1;
+        return 0;
+      }
+    });
+  }, [restricciones, sortConfig]);
 
   const handleEditClick = (restriccion: RestriccionesForm) => {
     setSelectedRestriccion(restriccion);
@@ -50,8 +80,34 @@ const ListadoRestricciones: React.FC = () => {
   };
 
   const handleModalClose = () => {
+    if (selectedRestriccion) {
+      const adjustedRestriccion: RestriccionesForm = {
+        ...selectedRestriccion,
+        fechacreacion: selectedRestriccion.fechacreacion
+          ? new Date(
+              new Date(selectedRestriccion.fechacreacion).getTime() -
+              new Date(selectedRestriccion.fechacreacion).getTimezoneOffset() * 60000
+            ).toISOString().split('T')[0]
+          : '',
+        fechacompromiso: selectedRestriccion.fechacompromiso
+          ? new Date(
+              new Date(selectedRestriccion.fechacompromiso).getTime() -
+              new Date(selectedRestriccion.fechacompromiso).getTimezoneOffset() * 60000
+            ).toISOString().split('T')[0]
+          : '',
+        nuevafecha: selectedRestriccion.nuevafecha
+          ? new Date(
+              new Date(selectedRestriccion.nuevafecha).getTime() -
+              new Date(selectedRestriccion.nuevafecha).getTimezoneOffset() * 60000
+            ).toISOString().split('T')[0]
+          : '',
+      };
+
+      setSelectedRestriccion(adjustedRestriccion);
+    }
+
     setIsModalOpen(false);
-    setSelectedRestriccion(null);
+    setRefreshKey((prevKey) => prevKey + 1); // Incrementa para forzar la re-renderización
   };
 
   const handleUpdate = (updatedRestriccion: RestriccionesForm) => {
@@ -85,19 +141,31 @@ const ListadoRestricciones: React.FC = () => {
       <table className="min-w-full bg-white border border-gray-200">
         <thead>
           <tr className="bg-gray-100">
-            <th className="px-4 py-2 border-b">Responsable</th>
-            <th className="px-4 py-2 border-b">Compromiso</th>
+            <th onClick={() => handleSort('responsable')} className="px-4 py-2 border-b cursor-pointer">
+              Responsable {sortConfig?.key === 'responsable' ? (sortConfig.direction === 'asc' ? '↑' : '↓') : ''}
+            </th>
+            <th onClick={() => handleSort('compromiso')} className="px-4 py-2 border-b cursor-pointer">
+              Compromiso {sortConfig?.key === 'compromiso' ? (sortConfig.direction === 'asc' ? '↑' : '↓') : ''}
+            </th>
             <th className="px-4 py-2 border-b">Centro de Costo</th>
-            <th className="px-4 py-2 border-b">Fecha de Creación</th>
-            <th className="px-4 py-2 border-b">Fecha de Compromiso</th>
+            <th onClick={() => handleSort('fechacreacion')} className="px-4 py-2 border-b cursor-pointer">
+              Fecha de Creación {sortConfig?.key === 'fechacreacion' ? (sortConfig.direction === 'asc' ? '↑' : '↓') : ''}
+            </th>
+            <th onClick={() => handleSort('fechacompromiso')} className="px-4 py-2 border-b cursor-pointer">
+              Fecha de Compromiso {sortConfig?.key === 'fechacompromiso' ? (sortConfig.direction === 'asc' ? '↑' : '↓') : ''}
+            </th>
             <th className="px-4 py-2 border-b">CNC</th>
-            <th className="px-4 py-2 border-b">Nueva Fecha</th>
-            <th className="px-4 py-2 border-b">Status</th>
+            <th onClick={() => handleSort('nuevafecha')} className="px-4 py-2 border-b cursor-pointer">
+              Nueva Fecha {sortConfig?.key === 'nuevafecha' ? (sortConfig.direction === 'asc' ? '↑' : '↓') : ''}
+            </th>
+            <th onClick={() => handleSort('status')} className="px-4 py-2 border-b cursor-pointer">
+              Status {sortConfig?.key === 'status' ? (sortConfig.direction === 'asc' ? '↑' : '↓') : ''}
+            </th>
             <th className="px-4 py-2 border-b">Acciones</th>
           </tr>
         </thead>
         <tbody>
-          {restricciones.map((restriccion) => (
+          {sortedRestricciones.map((restriccion) => (
             <tr key={restriccion._id} className="hover:bg-gray-50">
               <td className="px-4 py-2 border-b">{restriccion.responsable}</td>
               <td className="px-4 py-2 border-b">{restriccion.compromiso}</td>

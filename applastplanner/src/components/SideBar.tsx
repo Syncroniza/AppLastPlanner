@@ -34,11 +34,11 @@ const Sidebar: React.FC = () => {
                 Personal
               </Link>
             </li>
-            <li className="mb-2">
+            {/* <li className="mb-2">
               <Link to="/restricciones" className="block p-2 hover:bg-gray-700 rounded">
                 Restricciones
               </Link>
-            </li>
+            </li> */}
             <li className="mb-2">
               <Link to="/ppc" className="block p-2 hover:bg-gray-700 rounded">
                 PPC
