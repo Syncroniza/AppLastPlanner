@@ -93,7 +93,7 @@ const ResumenRestriccionesPorResponsable: React.FC = () => {
       <div className="relative" style={{ height: '400px' }}>
         <Bar data={chartData} options={chartOptions} />
       </div>
-      <div className="mt-4">
+      {/* <div className="mt-4">
         {agrupacion.map((item) => (
           <div key={item.responsable} className="p-2 border-b">
             <p>
@@ -104,7 +104,7 @@ const ResumenRestriccionesPorResponsable: React.FC = () => {
             </p>
           </div>
         ))}
-      </div>
+      </div> */}
     </div>
   );
 };

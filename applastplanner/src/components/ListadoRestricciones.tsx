@@ -119,15 +119,46 @@ const ListadoRestricciones: React.FC = () => {
   };
 
   const handleExportToExcel = () => {
-    const worksheet = XLSX.utils.json_to_sheet(restricciones);
+    // Filtrar y formatear los datos para la exportación
+    const dataToExport = restricciones.map((restriccion) => ({
+      responsable: restriccion.responsable,
+      compromiso: restriccion.compromiso,
+      centrocosto: restriccion.centrocosto,
+      fechacreacion: restriccion.fechacreacion
+        ? new Date(new Date(restriccion.fechacreacion).getTime() - new Date().getTimezoneOffset() * 60000)
+            .toLocaleDateString('es-ES', {
+              day: '2-digit',
+              month: '2-digit',
+              year: '2-digit',
+            })
+        : '',
+      fechacompromiso: restriccion.fechacompromiso
+        ? new Date(new Date(restriccion.fechacompromiso).getTime() - new Date().getTimezoneOffset() * 60000)
+            .toLocaleDateString('es-ES', {
+              day: '2-digit',
+              month: '2-digit',
+              year: '2-digit',
+            })
+        : '',
+      cnc: restriccion.cnc,
+      nuevafecha: restriccion.nuevafecha
+        ? new Date(new Date(restriccion.nuevafecha).getTime() - new Date().getTimezoneOffset() * 60000)
+            .toLocaleDateString('es-ES', {
+              day: '2-digit',
+              month: '2-digit',
+              year: '2-digit',
+            })
+        : '',
+      status: restriccion.status,
+    }));
+  
+    // Crear y exportar el archivo Excel
+    const worksheet = XLSX.utils.json_to_sheet(dataToExport);
     const workbook = XLSX.utils.book_new();
     XLSX.utils.book_append_sheet(workbook, worksheet, 'Restricciones');
     XLSX.writeFile(workbook, 'restricciones.xlsx');
   };
-
-  if (!restricciones || restricciones.length === 0) {
-    return <p>No hay restricciones para este cliente y proyecto.</p>;
-  }
+  
 
   return (
     <div className="overflow-x-auto mt-4">
