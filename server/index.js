@@ -16,6 +16,8 @@ const whitelist = [
   "http://localhost:5173",
   "http://localhost:5174",
   "http://localhost:5175",
+  "https://planner.appsyncroniza.cl",
+    "https://dxbz1umzn4kb5.cloudfront.net"
 ];
 
 app.use(
