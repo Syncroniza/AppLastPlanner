@@ -4,6 +4,7 @@ import { Personal } from '../types/Personal';
 import { RestriccionesForm } from '../types/Restricciones';
 import { Cliente } from '../types/Cliente';
 import { Proyecto } from '../types/Proyecto';
+import {BASE_URL} from "../constants.ts";
 
 interface AppContextProps {
   clientes: Cliente[];
@@ -27,7 +28,7 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
   useEffect(() => {
     const fetchClientes = async () => {
       try {
-        const response = await axios.get('http://localhost:8000/clientes/');
+        const response = await axios.get(BASE_URL + '/clientes/');
         setClientes(response.data.data);
       } catch (error) {
         console.error('Error al obtener los clientes:', error);
@@ -36,7 +37,7 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
 
     const fetchProyectos = async () => {
       try {
-        const response = await axios.get('http://localhost:8000/proyectos/');
+        const response = await axios.get(BASE_URL + '/proyectos/');
         setProyectos(response.data.data);
       } catch (error) {
         console.error('Error al obtener los proyectos:', error);
@@ -45,7 +46,7 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
 
     const fetchEquipo = async () => {
       try {
-        const response = await axios.get('http://localhost:8000/equipo/');
+        const response = await axios.get(BASE_URL + '/equipo/');
         setEquipoData(response.data.data);
       } catch (error) {
         console.error('Error al obtener los datos del equipo:', error);
@@ -54,7 +55,7 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
 
     const fetchRestricciones = async () => {
       try {
-        const response = await axios.get('http://localhost:8000/restricciones/');
+        const response = await axios.get(BASE_URL + '/restricciones/');
         setRestricciones(response.data.data);
       } catch (error) {
         console.error('Error al obtener las restricciones:', error);

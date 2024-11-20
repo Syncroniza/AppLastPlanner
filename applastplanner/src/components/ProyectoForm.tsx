@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { Cliente } from '../types/Cliente';
+import {BASE_URL} from "../constants.ts";
 
 interface ProyectoFormProps {
   onProyectoCreated?: () => void; // Callback opcional para actualizar la lista de proyectos
@@ -20,7 +21,7 @@ const ProyectoForm: React.FC<ProyectoFormProps> = ({ onProyectoCreated }) => {
     // Cargar la lista de clientes al montar el componente
     const fetchClientes = async () => {
       try {
-        const response = await axios.get('http://localhost:8000/clientes/');
+        const response = await axios.get(BASE_URL + '/clientes/');
         setClientes(response.data.data);
       } catch (error) {
         console.error('Error al obtener los clientes:', error);
@@ -38,7 +39,7 @@ const ProyectoForm: React.FC<ProyectoFormProps> = ({ onProyectoCreated }) => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
-      const response = await axios.post('http://localhost:8000/proyectos/', formData);
+      const response = await axios.post(BASE_URL + '/proyectos/', formData);
       if (response.status === 201 || response.status === 200) {
         console.log('Proyecto creado correctamente:', response.data);
         setFormData({ nombre: '', descripcion: '', fechaInicio: '', fechaFin: '', clienteId: '' });

@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import axios from 'axios';
 import { useAppContext } from '../components/Context';
+import {BASE_URL} from "../constants.ts";
 
 const FormularioCliente: React.FC = () => {
   const { setClientes } = useAppContext();
@@ -10,7 +11,7 @@ const FormularioCliente: React.FC = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
-      const response = await axios.post('http://localhost:8000/clientes/', { nombre, email });
+      const response = await axios.post(BASE_URL + '/clientes/', { nombre, email });
       setClientes((prev) => [...prev, response.data]);
       setNombre('');
       setEmail('');

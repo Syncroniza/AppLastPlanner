@@ -3,6 +3,7 @@ import axios from 'axios';
 import PersonalForm from"../components/PersonalForm"
 
 import {useAppContext} from "../components/Context"
+import {BASE_URL} from "../constants.ts";
 
 const PersonalTable: React.FC = () => {
 
@@ -15,7 +16,7 @@ const PersonalTable: React.FC = () => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const response = await axios.get('http://localhost:8000/equipo/');
+        const response = await axios.get(BASE_URL + '/equipo/');
         console.log(response)
         setEquipoData(response.data.data);
         setLoading(false);

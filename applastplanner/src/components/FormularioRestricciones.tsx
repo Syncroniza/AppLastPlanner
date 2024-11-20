@@ -3,6 +3,7 @@ import axios from 'axios';
 import { RestriccionesForm } from '../types/Restricciones';
 import { useAppContext } from '../components/Context';
 import { useLocation } from 'react-router-dom';
+import {BASE_URL} from "../constants.ts";
 
 const FormularioRestricciones: React.FC = () => {
   const location = useLocation();
@@ -50,7 +51,7 @@ const FormularioRestricciones: React.FC = () => {
         nuevafecha: formData.nuevafecha ? adjustDateForTimezone(formData.nuevafecha) : '',
       };
 
-      const response = await axios.post('http://localhost:8000/restricciones/', dataToSend);
+      const response = await axios.post(BASE_URL + '/restricciones/', dataToSend);
       console.log('Datos enviados correctamente:', response.data);
 
       if (response.status === 201 || response.status === 200) {
