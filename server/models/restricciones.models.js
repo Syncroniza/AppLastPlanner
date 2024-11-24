@@ -39,12 +39,12 @@ const RestriccionesSchema = new mongoose.Schema(
     ],
     proyecto: {
       type: mongoose.Schema.Types.ObjectId,
-      ref: "proyectos", // Referencia a un proyecto
+      ref: "Proyecto", // Referencia a un proyecto
       required: true,
     },
     cliente: {
       type: mongoose.Schema.Types.ObjectId,
-      ref: "clientes", // Referencia a un cliente
+      ref: "Cliente", // Referencia a un cliente
       required: true,
     },
   },
@@ -53,4 +53,7 @@ const RestriccionesSchema = new mongoose.Schema(
   }
 );
 
-export const RestriccionesModel = mongoose.model("restricciones", RestriccionesSchema);
+export const RestriccionesModel = mongoose.model(
+  "restricciones",
+  RestriccionesSchema
+);

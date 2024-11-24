@@ -1,10 +1,10 @@
 import React, { useEffect, useState } from 'react';
-import axios from 'axios';
 import { useAppContext } from './Context';
 import { useLocation } from 'react-router-dom';
 import Modal from './Modal'; // Asegúrate de que la ruta de importación sea correcta
 import { RestriccionesForm } from '../types/Restricciones';
 import * as XLSX from 'xlsx';
+import API from '../api';
 
 const ListadoRestricciones: React.FC = () => {
   const { restricciones, setRestricciones } = useAppContext();
@@ -20,21 +20,18 @@ const ListadoRestricciones: React.FC = () => {
   useEffect(() => {
     const fetchRestricciones = async () => {
       try {
-        const response = await axios.get(`http://localhost:8000/restricciones`, {
-          params: {
-            clienteId,
-            proyectoId,
-          },
+        const response = await API.get('/restricciones', {
+          params: { clienteId, proyectoId }, // Pasa los parámetros
         });
 
         if (response.data && response.data.data.length > 0) {
           setRestricciones(response.data.data);
         } else {
-          setRestricciones([]); // Limpia la lista si no hay datos
+          setRestricciones([]);
         }
       } catch (error) {
         console.error('Error al obtener las restricciones:', error);
-        setRestricciones([]); // Limpia la lista en caso de error
+        setRestricciones([]);
       }
     };
 
@@ -44,8 +41,7 @@ const ListadoRestricciones: React.FC = () => {
       console.warn('clienteId o proyectoId no está presente');
       setRestricciones([]);
     }
-  }, [clienteId, proyectoId, setRestricciones, refreshKey]); // Agrega refreshKey como dependencia
-
+  }, [clienteId, proyectoId, setRestricciones, refreshKey]);
   // Función para manejar el clic de ordenar
   const handleSort = (key: string) => {
     let direction: 'asc' | 'desc' = 'asc';

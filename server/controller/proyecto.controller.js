@@ -10,19 +10,20 @@ export async function getAllProyectos(req, res) {
   }
 }
 
-export async function getProyectoById(req, res) {
+export const getProyectoById = async (req, res) => {
   try {
-    const proyecto = await ProyectoModel.findById(req.params.id).populate(
-      "cliente"
-    );
+    const proyecto = await ProyectoModel.findById(req.params.id).populate("cliente");
     if (!proyecto) {
-      return res.status(404).json({ message: "Proyecto no encontrado" });
+      return res.status(404).json({ error: "Proyecto no encontrado" });
     }
-    res.status(200).json({ data: proyecto });
+    res.status(200).json(proyecto);
   } catch (error) {
-    res.status(500).json({ error: error.message });
+    console.error("Error al obtener el proyecto:", error);
+    res.status(500).json({ error: "Error al obtener el proyecto" });
   }
-}
+};
+
+
 
 export async function createProyecto(req, res) {
   try {
