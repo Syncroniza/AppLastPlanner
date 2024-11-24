@@ -15,7 +15,14 @@ const app = express();
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-const whitelist = ["http://localhost:5173", "http://localhost:5174", "http://localhost:5175"];
+const whitelist = [
+  "http://localhost:5173",
+  "http://localhost:5174",
+  "http://localhost:5175",
+  "https://planner.appsyncroniza.cl",
+    "https://dxbz1umzn4kb5.cloudfront.net"
+];
+
 app.use(
   cors({
     credentials: true,

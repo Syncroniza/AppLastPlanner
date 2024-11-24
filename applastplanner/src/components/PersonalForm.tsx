@@ -1,5 +1,6 @@
 import axios from 'axios';
 import React, { useState } from 'react';
+import {BASE_URL} from "../constants.ts";
 
 interface TeamMember {
   id: string;
@@ -31,7 +32,7 @@ const FormularioEquipo: React.FC = () => {
     e.preventDefault();
     
     try {
-        const response = await axios.post('http://localhost:8000/equipo/', formData);
+        const response = await axios.post(BASE_URL + '/equipo/', formData);
       
       if (response.status === 200 || response.status === 201) {
         console.log('Datos enviados correctamente');
