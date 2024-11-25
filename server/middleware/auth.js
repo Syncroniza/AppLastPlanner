@@ -30,15 +30,11 @@ export const checkRole = (requiredRole) => {
   return (req, res, next) => {
     const { user } = req;
 
-    // Si es administrador, acceso total
-    if (user && user.role === "admin") {
-      console.log("Acceso otorgado: Administrador");
-      return next();
-    }
+    let roles =  Array.isArray(requiredRole) ? requiredRole : [requiredRole];
 
-    // Si no se requiere rol admin, permite continuar
-    if (requiredRole !== "admin") {
-      console.log(`Acceso permitido para rol: ${user.role}`);
+    // Si es administrador, acceso total
+    if (user && roles.includes(user.role)) {
+      console.log(`Acceso otorgado: ${user.role}`);
       return next();
     }
 
