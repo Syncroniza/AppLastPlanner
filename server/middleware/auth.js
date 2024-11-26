@@ -49,7 +49,6 @@ export const checkRole = (requiredRole) => {
 
 
 
-
 export const checkAccessToEntity = (entityType) => {
   return (req, res, next) => {
     const { user } = req; // El usuario ya está disponible gracias a `authenticateJWT`

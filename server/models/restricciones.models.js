@@ -39,12 +39,12 @@ const RestriccionesSchema = new mongoose.Schema(
     ],
     proyecto: {
       type: mongoose.Schema.Types.ObjectId,
-      ref: "Proyecto", // Referencia a un proyecto
+      ref: "proyecto", // Referencia a un proyecto
       required: true,
     },
     cliente: {
       type: mongoose.Schema.Types.ObjectId,
-      ref: "Cliente", // Referencia a un cliente
+      ref: "cliente", // Referencia a un cliente
       required: true,
     },
   },

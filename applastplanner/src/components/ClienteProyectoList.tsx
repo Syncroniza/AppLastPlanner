@@ -21,16 +21,27 @@ const ClienteProyectoList: React.FC = () => {
           <h3 className="text-xl font-semibold">{cliente.nombre}</h3>
           {cliente.proyectos && cliente.proyectos.length > 0 ? (
             cliente.proyectos.map((proyecto: Proyecto) => (
+
               <div key={proyecto._id} className="ml-4 mt-2 p-2 border rounded-md">
                 <p><strong>Proyecto:</strong> {proyecto.nombre}</p>
                 <p><strong>Descripción:</strong> {proyecto.descripcion}</p>
                 <div className="mt-2">
-                  <button
-                    onClick={() => handleCrearRestricciones(cliente._id, proyecto._id, cliente.nombre, proyecto.nombre)}
-                    className="mr-2 px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
-                  >
-                    Crear Restricciones
-                  </button>
+                <button
+          onClick={() => {
+            if (cliente && cliente._id && proyecto && proyecto._id) {
+              console.log("Cliente ID:", cliente._id);
+              console.log("Proyecto ID:", proyecto._id);
+              console.log("Cliente Nombre:", cliente.nombre);
+              console.log("Proyecto Nombre:", proyecto.nombre);
+              handleCrearRestricciones(cliente._id, proyecto._id, cliente.nombre, proyecto.nombre);
+            } else {
+              console.error("Error: Cliente o proyecto no tienen datos válidos.");
+            }
+          }}
+          className="mr-2 px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
+        >
+          Crear Restricciones
+        </button>
                   <button
                     onClick={() => window.location.href = `/proyectos/${proyecto._id}/personal`}
                     className="px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600"

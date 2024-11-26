@@ -1,5 +1,4 @@
 import React, { createContext, useState, useContext, ReactNode, useEffect } from 'react';
-import axios from 'axios';
 import { Personal } from '../types/Personal';
 import { RestriccionesForm } from '../types/Restricciones';
 import { Cliente } from '../types/Cliente';
@@ -15,6 +14,10 @@ interface AppContextProps {
   setEquipoData: React.Dispatch<React.SetStateAction<Personal[]>>;
   restricciones: RestriccionesForm[];
   setRestricciones: React.Dispatch<React.SetStateAction<RestriccionesForm[]>>;
+  fetchRestricciones: () => Promise<void>;
+  filteredRestricciones: RestriccionesForm[];
+  setFilteredRestricciones: React.Dispatch<React.SetStateAction<RestriccionesForm[]>>;
+  getRestriccionesByProyecto: (proyectoId: string, clienteId?: string) => RestriccionesForm[];
 }
 
 const AppContext = createContext<AppContextProps | undefined>(undefined);
@@ -24,11 +27,33 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
   const [proyectos, setProyectos] = useState<Proyecto[]>([]);
   const [equipoData, setEquipoData] = useState<Personal[]>([]);
   const [restricciones, setRestricciones] = useState<RestriccionesForm[]>([]);
+  const [filteredRestricciones, setFilteredRestricciones] = useState<RestriccionesForm[]>([]);
+
+  // Función para obtener restricciones desde el backend
+  const fetchRestricciones = async () => {
+    try {
+      const response = await API.get('/restricciones/');
+      console.log('Restricciones cargadas:', response.data.data);
+      setRestricciones(response.data.data);
+    } catch (error) {
+      console.error('Error al cargar las restricciones:', error);
+    }
+  };
+
+  // Función para filtrar restricciones por proyectoId (y opcionalmente clienteId)
+  const getRestriccionesByProyecto = (proyectoId: string, clienteId?: string): RestriccionesForm[] => {
+    return restricciones.filter((restriccion) => {
+      const matchProyecto = restriccion.proyecto === proyectoId;
+      const matchCliente = clienteId ? restriccion.cliente === clienteId : true;
+      return matchProyecto && matchCliente;
+    });
+  };
 
   useEffect(() => {
     const fetchClientes = async () => {
       try {
-        const response = await API.get('/clientes/'); // Usa el cliente configurado
+        const response = await API.get('/clientes/');
+        console.log('Clientes obtenidos:', response.data.data);
         setClientes(response.data.data);
       } catch (error) {
         console.error('Error al obtener los clientes:', error);
@@ -37,7 +62,7 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
 
     const fetchProyectos = async () => {
       try {
-        const response = await API.get('/proyectos/'); // Usa el cliente configurado
+        const response = await API.get('/proyectos/');
         setProyectos(response.data.data);
       } catch (error) {
         console.error('Error al obtener los proyectos:', error);
@@ -46,40 +71,36 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
 
     const fetchEquipo = async () => {
       try {
-        const response = await API.get('/equipo/'); // Usa el cliente configurado
+        const response = await API.get('/equipo/');
         setEquipoData(response.data.data);
       } catch (error) {
         console.error('Error al obtener los datos del equipo:', error);
       }
     };
 
-    const fetchRestricciones = async () => {
-      try {
-        const response = await API.get('/restricciones/'); // Usa el cliente configurado
-        setRestricciones(response.data.data);
-      } catch (error) {
-        console.error('Error al obtener las restricciones:', error);
-      }
-    };
-
-    // Llamadas a las funciones para cargar los datos al montar el contexto
     fetchClientes();
     fetchProyectos();
     fetchEquipo();
-    fetchRestricciones();
+    fetchRestricciones(); // Cargar restricciones
   }, []);
 
   return (
-    <AppContext.Provider value={{
-      clientes,
-      setClientes,
-      proyectos,
-      setProyectos,
-      equipoData,
-      setEquipoData,
-      restricciones,
-      setRestricciones
-    }}>
+    <AppContext.Provider
+      value={{
+        clientes,
+        setClientes,
+        proyectos,
+        setProyectos,
+        equipoData,
+        setEquipoData,
+        restricciones,
+        setRestricciones,
+        fetchRestricciones,
+        getRestriccionesByProyecto,
+        filteredRestricciones,
+        setFilteredRestricciones, // Añadido al contexto
+      }}
+    >
       {children}
     </AppContext.Provider>
   );

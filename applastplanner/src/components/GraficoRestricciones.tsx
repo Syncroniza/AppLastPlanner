@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { Pie } from 'react-chartjs-2';
 import { useAppContext } from './Context';
 import {
@@ -7,19 +7,38 @@ import {
   Tooltip,
   Legend,
 } from 'chart.js';
+import { RestriccionesForm } from '../types/Restricciones';
 
 // Registrar los elementos de Chart.js
 ChartJS.register(ArcElement, Tooltip, Legend);
 
-const GraficoRestricciones: React.FC = () => {
-  const { restricciones } = useAppContext();
+interface GraficoRestriccionesProps {
+  proyectoId: string;
+  clienteId?: string; // El clienteId es opcional
+}
 
-  // Filtrar y contar las restricciones abiertas y cerradas
-  const abiertas = restricciones.filter((r) => r.status === 'abierta').length;
-  const cerradas = restricciones.filter((r) => r.status === 'cerrada').length;
+const GraficoRestricciones: React.FC<GraficoRestriccionesProps> = ({ proyectoId, clienteId }) => {
+  const { getRestriccionesByProyecto } = useAppContext();
+  const [restriccionesFiltradas, setRestriccionesFiltradas] = useState<RestriccionesForm[]>([]);
+  console.log("restriccionesFiltradas",restriccionesFiltradas)
+
+  // Filtrar las restricciones al cargar el componente o cuando cambien los props
+  useEffect(() => {
+    if (proyectoId) {
+      const restricciones = getRestriccionesByProyecto(proyectoId, clienteId);
+      setRestriccionesFiltradas(restricciones);
+    } else {
+      console.warn('No se recibió un proyectoId válido');
+    }
+  }, [proyectoId, clienteId, getRestriccionesByProyecto]);
+
+  // Contar restricciones abiertas y cerradas
+  const abiertas = restriccionesFiltradas.filter((r) => r.status === 'abierta').length;
+  console.log("abiertas",abiertas)
+  const cerradas = restriccionesFiltradas.filter((r) => r.status === 'cerrada').length;
   const total = abiertas + cerradas;
 
-  // Datos para el gráfico de torta
+  // Configuración de los datos para el gráfico
   const data = {
     labels: ['Abiertas', 'Cerradas'],
     datasets: [

@@ -4,45 +4,45 @@ import { useLocation } from 'react-router-dom';
 import Modal from './Modal'; // Asegúrate de que la ruta de importación sea correcta
 import { RestriccionesForm } from '../types/Restricciones';
 import * as XLSX from 'xlsx';
-import API from '../api';
 
 const ListadoRestricciones: React.FC = () => {
-  const { restricciones, setRestricciones } = useAppContext();
+  const { restricciones, getRestriccionesByProyecto, } = useAppContext();
   const location = useLocation();
-  const { clienteId, proyectoId } = location.state || {}; // Extrae clienteId y proyectoId del estado de la navegación
+  const { clienteId, proyectoId } = location.state || {}; // Extrae clienteId y proyectoId del estado
 
+  const [filteredRestricciones, setFilteredRestricciones] = useState<RestriccionesForm[]>([]);
+  
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedRestriccion, setSelectedRestriccion] = useState<RestriccionesForm | null>(null);
   const [sortConfig, setSortConfig] = useState<{ key: string; direction: 'asc' | 'desc' } | null>(null);
-  const [refreshKey, setRefreshKey] = useState(0); // Estado para forzar la re-renderización
 
-  // Cargar las restricciones filtradas por cliente y proyecto
+  // Verifica y filtra las restricciones basadas en proyectoId y clienteId
   useEffect(() => {
-    const fetchRestricciones = async () => {
-      try {
-        const response = await API.get('/restricciones', {
-          params: { clienteId, proyectoId }, // Pasa los parámetros
-        });
-
-        if (response.data && response.data.data.length > 0) {
-          setRestricciones(response.data.data);
-        } else {
-          setRestricciones([]);
-        }
-      } catch (error) {
-        console.error('Error al obtener las restricciones:', error);
-        setRestricciones([]);
-      }
-    };
-
-    if (clienteId && proyectoId) {
-      fetchRestricciones();
+    if (proyectoId) {
+      const restriccionesFiltradas = getRestriccionesByProyecto(proyectoId, clienteId);
+      setFilteredRestricciones(restriccionesFiltradas);
     } else {
-      console.warn('clienteId o proyectoId no está presente');
-      setRestricciones([]);
+      console.warn('No se recibió proyectoId para filtrar restricciones');
+      setFilteredRestricciones([]);
     }
-  }, [clienteId, proyectoId, setRestricciones, refreshKey]);
-  // Función para manejar el clic de ordenar
+  }, [proyectoId, clienteId, getRestriccionesByProyecto]);
+
+  // Ordena las restricciones
+  const sortedRestricciones = React.useMemo(() => {
+    if (!sortConfig) return filteredRestricciones;
+    return [...filteredRestricciones].sort((a, b) => {
+      if (sortConfig.key === 'fechacreacion' || sortConfig.key === 'fechacompromiso' || sortConfig.key === 'nuevafecha') {
+        const dateA = new Date(a[sortConfig.key as keyof RestriccionesForm] as string);
+        const dateB = new Date(b[sortConfig.key as keyof RestriccionesForm] as string);
+        return sortConfig.direction === 'asc' ? dateA.getTime() - dateB.getTime() : dateB.getTime() - dateA.getTime();
+      } else {
+        const valueA = (a[sortConfig.key as keyof RestriccionesForm] as string).toLowerCase();
+        const valueB = (b[sortConfig.key as keyof RestriccionesForm] as string).toLowerCase();
+        return sortConfig.direction === 'asc' ? valueA.localeCompare(valueB) : valueB.localeCompare(valueA);
+      }
+    });
+  }, [filteredRestricciones, sortConfig]);
+
   const handleSort = (key: string) => {
     let direction: 'asc' | 'desc' = 'asc';
     if (sortConfig && sortConfig.key === key && sortConfig.direction === 'asc') {
@@ -51,110 +51,36 @@ const ListadoRestricciones: React.FC = () => {
     setSortConfig({ key, direction });
   };
 
-  // Ordena las restricciones basadas en sortConfig
-  const sortedRestricciones = React.useMemo(() => {
-    if (!sortConfig) return restricciones;
-
-    return [...restricciones].sort((a, b) => {
-      if (sortConfig.key === 'fechacreacion' || sortConfig.key === 'fechacompromiso' || sortConfig.key === 'nuevafecha') {
-        const dateA = new Date(a[sortConfig.key as keyof RestriccionesForm] as string);
-        const dateB = new Date(b[sortConfig.key as keyof RestriccionesForm] as string);
-        return sortConfig.direction === 'asc' ? dateA.getTime() - dateB.getTime() : dateB.getTime() - dateA.getTime();
-      } else {
-        const valueA = (a[sortConfig.key as keyof RestriccionesForm] as string).toLowerCase();
-        const valueB = (b[sortConfig.key as keyof RestriccionesForm] as string).toLowerCase();
-        if (valueA < valueB) return sortConfig.direction === 'asc' ? -1 : 1;
-        if (valueA > valueB) return sortConfig.direction === 'asc' ? 1 : -1;
-        return 0;
-      }
-    });
-  }, [restricciones, sortConfig]);
-
   const handleEditClick = (restriccion: RestriccionesForm) => {
     setSelectedRestriccion(restriccion);
     setIsModalOpen(true);
   };
 
   const handleModalClose = () => {
-    if (selectedRestriccion) {
-      const adjustedRestriccion: RestriccionesForm = {
-        ...selectedRestriccion,
-        fechacreacion: selectedRestriccion.fechacreacion
-          ? new Date(
-              new Date(selectedRestriccion.fechacreacion).getTime() -
-              new Date(selectedRestriccion.fechacreacion).getTimezoneOffset() * 60000
-            ).toISOString().split('T')[0]
-          : '',
-        fechacompromiso: selectedRestriccion.fechacompromiso
-          ? new Date(
-              new Date(selectedRestriccion.fechacompromiso).getTime() -
-              new Date(selectedRestriccion.fechacompromiso).getTimezoneOffset() * 60000
-            ).toISOString().split('T')[0]
-          : '',
-        nuevafecha: selectedRestriccion.nuevafecha
-          ? new Date(
-              new Date(selectedRestriccion.nuevafecha).getTime() -
-              new Date(selectedRestriccion.nuevafecha).getTimezoneOffset() * 60000
-            ).toISOString().split('T')[0]
-          : '',
-      };
-
-      setSelectedRestriccion(adjustedRestriccion);
-    }
-
     setIsModalOpen(false);
-    setRefreshKey((prevKey) => prevKey + 1); // Incrementa para forzar la re-renderización
-  };
-
-  const handleUpdate = (updatedRestriccion: RestriccionesForm) => {
-    setRestricciones((prevRestricciones) =>
-      prevRestricciones.map((restriccion) =>
-        restriccion._id === updatedRestriccion._id ? updatedRestriccion : restriccion
-      )
-    );
   };
 
   const handleExportToExcel = () => {
-    // Filtrar y formatear los datos para la exportación
-    const dataToExport = restricciones.map((restriccion) => ({
+    const dataToExport = filteredRestricciones.map((restriccion) => ({
       responsable: restriccion.responsable,
       compromiso: restriccion.compromiso,
       centrocosto: restriccion.centrocosto,
       fechacreacion: restriccion.fechacreacion
         ? new Date(new Date(restriccion.fechacreacion).getTime() - new Date().getTimezoneOffset() * 60000)
-            .toLocaleDateString('es-ES', {
-              day: '2-digit',
-              month: '2-digit',
-              year: '2-digit',
-            })
+            .toLocaleDateString('es-ES', { day: '2-digit', month: '2-digit', year: '2-digit' })
         : '',
       fechacompromiso: restriccion.fechacompromiso
         ? new Date(new Date(restriccion.fechacompromiso).getTime() - new Date().getTimezoneOffset() * 60000)
-            .toLocaleDateString('es-ES', {
-              day: '2-digit',
-              month: '2-digit',
-              year: '2-digit',
-            })
-        : '',
-      cnc: restriccion.cnc,
-      nuevafecha: restriccion.nuevafecha
-        ? new Date(new Date(restriccion.nuevafecha).getTime() - new Date().getTimezoneOffset() * 60000)
-            .toLocaleDateString('es-ES', {
-              day: '2-digit',
-              month: '2-digit',
-              year: '2-digit',
-            })
+            .toLocaleDateString('es-ES', { day: '2-digit', month: '2-digit', year: '2-digit' })
         : '',
       status: restriccion.status,
     }));
-  
-    // Crear y exportar el archivo Excel
+
     const worksheet = XLSX.utils.json_to_sheet(dataToExport);
     const workbook = XLSX.utils.book_new();
     XLSX.utils.book_append_sheet(workbook, worksheet, 'Restricciones');
     XLSX.writeFile(workbook, 'restricciones.xlsx');
   };
-  
 
   return (
     <div className="overflow-x-auto mt-4">
@@ -181,49 +107,52 @@ const ListadoRestricciones: React.FC = () => {
             <th onClick={() => handleSort('fechacompromiso')} className="px-4 py-2 border-b cursor-pointer">
               Fecha de Compromiso {sortConfig?.key === 'fechacompromiso' ? (sortConfig.direction === 'asc' ? '↑' : '↓') : ''}
             </th>
-            <th className="px-4 py-2 border-b">CNC</th>
-            <th onClick={() => handleSort('nuevafecha')} className="px-4 py-2 border-b cursor-pointer">
-              Nueva Fecha {sortConfig?.key === 'nuevafecha' ? (sortConfig.direction === 'asc' ? '↑' : '↓') : ''}
-            </th>
-            <th onClick={() => handleSort('status')} className="px-4 py-2 border-b cursor-pointer">
-              Status {sortConfig?.key === 'status' ? (sortConfig.direction === 'asc' ? '↑' : '↓') : ''}
-            </th>
+            <th className="px-4 py-2 border-b">Status</th>
             <th className="px-4 py-2 border-b">Acciones</th>
           </tr>
         </thead>
         <tbody>
-          {sortedRestricciones.map((restriccion) => (
-            <tr key={restriccion._id} className="hover:bg-gray-50">
-              <td className="px-4 py-2 border-b">{restriccion.responsable}</td>
-              <td className="px-4 py-2 border-b">{restriccion.compromiso}</td>
-              <td className="px-4 py-2 border-b">{restriccion.centrocosto}</td>
-              <td className="px-4 py-2 border-b">{new Date(restriccion.fechacreacion).toLocaleDateString('es-ES')}</td>
-              <td className="px-4 py-2 border-b">{new Date(restriccion.fechacompromiso).toLocaleDateString('es-ES')}</td>
-              <td className="px-4 py-2 border-b">{restriccion.cnc}</td>
-              <td className="px-4 py-2 border-b">
-                {restriccion.nuevafecha ? new Date(restriccion.nuevafecha).toLocaleDateString('es-ES') : ''}
-              </td>
-              <td className="px-4 py-2 border-b">{restriccion.status}</td>
-              <td className="px-4 py-2 border-b">
-                <button
-                  onClick={() => handleEditClick(restriccion)}
-                  className="bg-blue-500 text-white px-2 py-1 rounded hover:bg-blue-600"
-                >
-                  Editar
-                </button>
+          {sortedRestricciones.length > 0 ? (
+            sortedRestricciones.map((restriccion) => (
+              <tr key={restriccion._id} className="hover:bg-gray-50">
+                <td className="px-4 py-2 border-b">{restriccion.responsable}</td>
+                <td className="px-4 py-2 border-b">{restriccion.compromiso}</td>
+                <td className="px-4 py-2 border-b">{restriccion.centrocosto}</td>
+                <td className="px-4 py-2 border-b">{new Date(restriccion.fechacreacion).toLocaleDateString('es-ES')}</td>
+                <td className="px-4 py-2 border-b">{new Date(restriccion.fechacompromiso).toLocaleDateString('es-ES')}</td>
+                <td className="px-4 py-2 border-b">{restriccion.status}</td>
+                <td className="px-4 py-2 border-b">
+                  <button
+                    onClick={() => handleEditClick(restriccion)}
+                    className="bg-blue-500 text-white px-2 py-1 rounded hover:bg-blue-600"
+                  >
+                    Editar
+                  </button>
+                </td>
+              </tr>
+            ))
+          ) : (
+            <tr>
+              <td colSpan={7} className="px-4 py-2 border-b text-center">
+                No hay restricciones para este proyecto.
               </td>
             </tr>
-          ))}
+          )}
         </tbody>
       </table>
 
-      {/* Modal de edición */}
       {isModalOpen && (
         <Modal
           isOpen={isModalOpen}
           onClose={handleModalClose}
           restriccion={selectedRestriccion}
-          onUpdate={handleUpdate}
+          onUpdate={(updatedRestriccion) => {
+            const updated = restricciones.map((r) =>
+              r._id === updatedRestriccion._id ? updatedRestriccion : r
+            );
+            setFilteredRestricciones(updated);
+            setIsModalOpen(false);
+          }}
         />
       )}
     </div>

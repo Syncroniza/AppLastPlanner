@@ -6,11 +6,19 @@ import {
   deleteProyecto,
 } from "../controller/proyecto.controller.js";
 
-import { authenticateJWT, checkRole, checkAccessToEntity } from "../middleware/auth.js";
+import { authenticateJWT, 
+  checkRole,
+  checkAccessToEntity } 
+  from "../middleware/auth.js";
 
 const proyectoRoutes = (app) => {
   // Ruta para obtener todos los proyectos (solo administradores)
-  app.get("/proyectos/", authenticateJWT, checkRole(["admin", "user"]), getAllProyectos);
+  
+  app.get(
+    "/proyectos/", 
+    authenticateJWT, 
+    checkRole(["admin", "user"]), 
+    getAllProyectos);
 
   // Ruta para obtener un proyecto específico (administradores o usuarios con acceso explícito)
   app.get(

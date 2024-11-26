@@ -1,3 +1,4 @@
+import { Admin } from "mongodb";
 import {
   getAllRestriciones,
   getOneRestricciones,
@@ -5,22 +6,14 @@ import {
   deleteRestricciones,
   editRestricciones,
 } from "../controller/restricciones.controller.js";
-import { authenticateJWT, checkAccessToEntity } from "../middleware/auth.js";
+import { authenticateJWT, checkAccessToEntity, checkRole } from "../middleware/auth.js";
 
 const restriccioesRoutes = (app) => {
   // Ruta para obtener todas las restricciones
   app.get(
     "/restricciones/",
     authenticateJWT,
-    (req, res, next) => {
-      if (req.user.role === "admin") {
-        console.log("Acceso otorgado: Administrador a todas las restricciones");
-        return next(); // Administradores tienen acceso total
-      }
-      return res
-        .status(403)
-        .json({ error: "Acceso denegado: Solo los administradores pueden acceder a todas las restricciones" });
-    },
+    checkRole(["admin","user"]),
     getAllRestriciones
   );
 
@@ -28,13 +21,7 @@ const restriccioesRoutes = (app) => {
   app.get(
     "/restricciones/proyecto/:proyectoId",
     authenticateJWT,
-    (req, res, next) => {
-      if (req.user.role === "admin" || req.user.role === "user") {
-        console.log("Acceso permitido: Administrador a restricciones de proyectos");
-        return next(); // Administradores tienen acceso total
-      }
-      checkAccessToEntity("proyectos")(req, res, next); // Usuarios necesitan permisos explícitos
-    },
+    checkRole(["admin","user"]),
     getOneRestricciones
   );
   

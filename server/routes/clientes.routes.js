@@ -12,16 +12,7 @@ const clienteRoutes = (app) => {
   app.get(
     "/clientes/",
     authenticateJWT,
-    (req, res, next) => {
-      if (req.user.role === "admin") {
-        // Si es admin, permite el acceso completo
-        return next();
-      } else {
-        // Si es usuario, verifica acceso por cliente
-        req.params.id = req.user.access.clientes; // Establece los IDs permitidos en la solicitud
-        return checkAccessToEntity("clientes")(req, res, next);
-      }
-    },
+    checkRole(["admin", "user"]), 
     getAllClientes
   );
 

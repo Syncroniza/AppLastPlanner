@@ -13,7 +13,7 @@ export async function getAllClientes(req, res) {
     }
 
     // Si es "user", devuelve solo los clientes permitidos
-    const clientes = await ClienteModel.find({ _id: { $in: user.access.clientes } });
+    const clientes = await ClienteModel.find({ _id: { $in: user.access.clientes } }).populate('proyectos');
     res.status(200).json({ data: clientes });
   } catch (error) {
     console.error("Error al obtener los clientes:", error);
@@ -23,7 +23,7 @@ export async function getAllClientes(req, res) {
 
 export async function getClienteById(req, res) {
   try {
-    const cliente = await ClienteModel.findById(req.params.id);
+    const cliente = await ClienteModel.findById(req.params.id).populate('proyectos');
     if (!cliente) {
       return res.status(404).json({ message: "Cliente no encontrado" });
     }

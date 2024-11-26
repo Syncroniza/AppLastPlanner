@@ -1,8 +1,8 @@
 import { Types, Error } from "mongoose";
 const { ObjectId } = Types;
 import { RestriccionesModel } from "../models/restricciones.models.js";
-import {ClienteModel} from "../models/cliente.models.js"
-import {ProyectoModel}from "../models/proyecto.models.js"
+import { ClienteModel } from "../models/cliente.models.js";
+import { ProyectoModel } from "../models/proyecto.models.js";
 
 export function getAllRestriciones(req, res) {
   const { proyectoId, clienteId } = req.query; // Obtener proyectoId y clienteId de los query params
@@ -19,7 +19,9 @@ export function getAllRestriciones(req, res) {
     .then((data) => {
       console.log("Datos obtenidos:", data);
       if (data.length === 0) {
-        return res.status(404).json({ message: "No se encontraron restricciones" });
+        return res
+          .status(404)
+          .json({ message: "No se encontraron restricciones" });
       }
       res.json({ data });
     })
@@ -29,7 +31,6 @@ export function getAllRestriciones(req, res) {
     });
 }
 
-
 export function getOneRestricciones(req, res) {
   const proyectoId = req.params.proyectoId;
   if (!ObjectId.isValid(proyectoId)) {
@@ -37,11 +38,15 @@ export function getOneRestricciones(req, res) {
   }
 
   RestriccionesModel.find({ proyecto: proyectoId })
-    .populate('proyecto') // Población del proyecto
-    .populate('cliente')  // Población del cliente
+    .populate("Proyecto") // Población del proyecto
+    .populate("Cliente") // Población del cliente
     .then((data) => {
       if (data.length === 0) {
-        return res.status(404).json({ message: "No se encontraron restricciones para este proyecto" });
+        return res
+          .status(404)
+          .json({
+            message: "No se encontraron restricciones para este proyecto",
+          });
       }
       res.json({ data });
     })
@@ -49,6 +54,16 @@ export function getOneRestricciones(req, res) {
       console.error("Error al obtener restricciones por proyecto:", error);
       res.status(500).json({ error: error.message || error });
     });
+}
+export async function getRestriccionesByProyecto(req, res) {
+  const { proyectoId } = req.params;
+  try {
+    const restricciones = await RestriccionesModel.find({ proyecto: proyectoId });
+    res.status(200).json({ data: restricciones });
+  } catch (error) {
+    console.error("Error al obtener restricciones:", error);
+    res.status(500).json({ error: "Error al obtener restricciones" });
+  }
 }
 
 
@@ -78,12 +93,18 @@ export async function createRestricciones(req, res) {
 
     // Verifica si el proyecto pertenece al cliente (opcional)
     if (!proyecto.clienteId.equals(cliente._id)) {
-      console.log(`El proyecto con ID ${proyectoId} no pertenece al cliente con ID ${clienteId}`); // Log de depuración
-      return res.status(400).json({ message: "El proyecto no pertenece al cliente proporcionado" });
+      console.log(
+        `El proyecto con ID ${proyectoId} no pertenece al cliente con ID ${clienteId}`
+      ); // Log de depuración
+      return res
+        .status(400)
+        .json({ message: "El proyecto no pertenece al cliente proporcionado" });
     }
 
     // Encuentra el último documento y genera un nuevo ID basado en él
-    const lastRestriccion = await RestriccionesModel.findOne().sort({ id_restriccion: -1 }).exec();
+    const lastRestriccion = await RestriccionesModel.findOne()
+      .sort({ id_restriccion: -1 })
+      .exec();
     const newNumber = lastRestriccion
       ? parseInt(lastRestriccion.id_restriccion.split("-")[1], 10) + 1
       : 101;
