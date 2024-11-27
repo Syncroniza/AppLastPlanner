@@ -21,6 +21,7 @@ const Login: React.FC = () => {
   return (
     <div className="flex items-center justify-center h-screen bg-gray-100">
       <div className="w-full max-w-md bg-white rounded shadow p-6">
+        <h1 className="text-3xl font-bold mb-4">Syncroniza Restricciones</h1>
         <h1 className="text-xl font-bold mb-4">Iniciar Sesión</h1>
         <form onSubmit={handleSubmit}>
           <div className="mb-4">

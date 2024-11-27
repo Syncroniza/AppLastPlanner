@@ -6,6 +6,10 @@ import { Proyecto } from '../types/Proyecto';
 import API from '../api';
 
 interface AppContextProps {
+  clienteId: string | null;
+  setClienteId: React.Dispatch<React.SetStateAction<string | null>>;
+  proyectoId: string | null;
+  setProyectoId: React.Dispatch<React.SetStateAction<string | null>>;
   clientes: Cliente[];
   setClientes: React.Dispatch<React.SetStateAction<Cliente[]>>;
   proyectos: Proyecto[];
@@ -15,19 +19,22 @@ interface AppContextProps {
   restricciones: RestriccionesForm[];
   setRestricciones: React.Dispatch<React.SetStateAction<RestriccionesForm[]>>;
   fetchRestricciones: () => Promise<void>;
-  filteredRestricciones: RestriccionesForm[];
-  setFilteredRestricciones: React.Dispatch<React.SetStateAction<RestriccionesForm[]>>;
   getRestriccionesByProyecto: (proyectoId: string, clienteId?: string) => RestriccionesForm[];
+  
 }
 
 const AppContext = createContext<AppContextProps | undefined>(undefined);
 
 export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
+  const [clienteId, setClienteId] = useState<string | null>(null);
+  console.log("contextclienteID",clienteId)
+  const [proyectoId, setProyectoId] = useState<string | null>(null);
+  console.log("contextProyectID",proyectoId)
   const [clientes, setClientes] = useState<Cliente[]>([]);
   const [proyectos, setProyectos] = useState<Proyecto[]>([]);
   const [equipoData, setEquipoData] = useState<Personal[]>([]);
   const [restricciones, setRestricciones] = useState<RestriccionesForm[]>([]);
-  const [filteredRestricciones, setFilteredRestricciones] = useState<RestriccionesForm[]>([]);
+  
 
   // Función para obtener restricciones desde el backend
   const fetchRestricciones = async () => {
@@ -43,11 +50,16 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
   // Función para filtrar restricciones por proyectoId (y opcionalmente clienteId)
   const getRestriccionesByProyecto = (proyectoId: string, clienteId?: string): RestriccionesForm[] => {
     return restricciones.filter((restriccion) => {
-      const matchProyecto = restriccion.proyecto === proyectoId;
-      const matchCliente = clienteId ? restriccion.cliente === clienteId : true;
+      const matchProyecto = restriccion.proyecto?.toString().trim() === proyectoId.trim();
+      const matchCliente = clienteId ? restriccion.cliente?.toString().trim() === clienteId.trim() : true;
+  
+      console.log("Comparando restricción:", restriccion);
+      console.log("matchProyecto:", matchProyecto, "matchCliente:", matchCliente);
+  
       return matchProyecto && matchCliente;
     });
   };
+  
 
   useEffect(() => {
     const fetchClientes = async () => {
@@ -97,8 +109,10 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
         setRestricciones,
         fetchRestricciones,
         getRestriccionesByProyecto,
-        filteredRestricciones,
-        setFilteredRestricciones, // Añadido al contexto
+        clienteId,
+        setClienteId,
+        proyectoId,
+        setProyectoId,
       }}
     >
       {children}

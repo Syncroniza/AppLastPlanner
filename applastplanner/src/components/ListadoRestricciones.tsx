@@ -7,25 +7,28 @@ import * as XLSX from 'xlsx';
 
 const ListadoRestricciones: React.FC = () => {
   const { restricciones, getRestriccionesByProyecto, } = useAppContext();
+
   const location = useLocation();
   const { clienteId, proyectoId } = location.state || {}; // Extrae clienteId y proyectoId del estado
-
   const [filteredRestricciones, setFilteredRestricciones] = useState<RestriccionesForm[]>([]);
-  
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedRestriccion, setSelectedRestriccion] = useState<RestriccionesForm | null>(null);
   const [sortConfig, setSortConfig] = useState<{ key: string; direction: 'asc' | 'desc' } | null>(null);
 
   // Verifica y filtra las restricciones basadas en proyectoId y clienteId
   useEffect(() => {
-    if (proyectoId) {
-      const restriccionesFiltradas = getRestriccionesByProyecto(proyectoId, clienteId);
-      setFilteredRestricciones(restriccionesFiltradas);
-    } else {
-      console.warn('No se recibió proyectoId para filtrar restricciones');
-      setFilteredRestricciones([]);
-    }
-  }, [proyectoId, clienteId, getRestriccionesByProyecto]);
+  console.log("proyectoId recibido en el gráfico:", proyectoId);
+  console.log("clienteId recibido en el gráfico:", clienteId);
+  
+  if (proyectoId) {
+    const restriccionesFiltradas = getRestriccionesByProyecto(proyectoId, clienteId);
+    console.log("Restricciones filtradas:", restriccionesFiltradas);
+    setFilteredRestricciones(restriccionesFiltradas);
+  } else {
+    console.warn("No se recibió proyectoId para filtrar restricciones");
+  }
+}, [proyectoId, clienteId, getRestriccionesByProyecto]);
+
 
   // Ordena las restricciones
   const sortedRestricciones = React.useMemo(() => {

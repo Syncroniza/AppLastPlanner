@@ -1,44 +1,49 @@
 import React, { useEffect, useState } from 'react';
 import { Pie } from 'react-chartjs-2';
-import { useAppContext } from './Context';
+import { useAppContext } from './Context'; // Asegúrate de que esta ruta sea correcta
 import {
   Chart as ChartJS,
   ArcElement,
   Tooltip,
   Legend,
 } from 'chart.js';
-import { RestriccionesForm } from '../types/Restricciones';
 
 // Registrar los elementos de Chart.js
 ChartJS.register(ArcElement, Tooltip, Legend);
 
-interface GraficoRestriccionesProps {
-  proyectoId: string;
-  clienteId?: string; // El clienteId es opcional
-}
+const GraficoRestricciones: React.FC = () => {
+  const { getRestriccionesByProyecto, proyectoId, clienteId } = useAppContext();
+  const [restriccionesFiltradas, setRestriccionesFiltradas] = useState<any[]>([]);
 
-const GraficoRestricciones: React.FC<GraficoRestriccionesProps> = ({ proyectoId, clienteId }) => {
-  const { getRestriccionesByProyecto } = useAppContext();
-  const [restriccionesFiltradas, setRestriccionesFiltradas] = useState<RestriccionesForm[]>([]);
-  console.log("restriccionesFiltradas",restriccionesFiltradas)
-
-  // Filtrar las restricciones al cargar el componente o cuando cambien los props
+  // Obtener las restricciones filtradas desde el contexto
   useEffect(() => {
     if (proyectoId) {
-      const restricciones = getRestriccionesByProyecto(proyectoId, clienteId);
+      const restricciones = getRestriccionesByProyecto(proyectoId, clienteId || undefined);
       setRestriccionesFiltradas(restricciones);
     } else {
-      console.warn('No se recibió un proyectoId válido');
+      console.warn('No se encontró proyectoId para filtrar restricciones en el gráfico');
     }
   }, [proyectoId, clienteId, getRestriccionesByProyecto]);
 
-  // Contar restricciones abiertas y cerradas
+  console.log('Restricciones para el gráfico:', restriccionesFiltradas);
+
+  // Verificar si restriccionesFiltradas es válida y no está vacía
+  if (!restriccionesFiltradas || restriccionesFiltradas.length === 0) {
+    return (
+      <div style={{ width: '25%', margin: '0 auto' }}>
+        <h2 className="text-2xl font-bold mb-4">Resumen de Restricciones</h2>
+        <p className="mt-4 text-xl">No hay restricciones disponibles para graficar.</p>
+      </div>
+    );
+  }
+
+  // Filtrar y contar las restricciones abiertas y cerradas
   const abiertas = restriccionesFiltradas.filter((r) => r.status === 'abierta').length;
-  console.log("abiertas",abiertas)
+  console.log("Abiertas:", abiertas);
   const cerradas = restriccionesFiltradas.filter((r) => r.status === 'cerrada').length;
   const total = abiertas + cerradas;
 
-  // Configuración de los datos para el gráfico
+  // Datos para el gráfico de torta
   const data = {
     labels: ['Abiertas', 'Cerradas'],
     datasets: [

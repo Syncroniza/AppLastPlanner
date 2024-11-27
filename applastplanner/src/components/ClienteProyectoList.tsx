@@ -4,10 +4,15 @@ import { Proyecto } from '../types/Proyecto';
 import { useNavigate } from 'react-router-dom';
 
 const ClienteProyectoList: React.FC = () => {
-  const { clientes } = useAppContext();
+
+  const { clientes,setClienteId, setProyectoId } = useAppContext();
   const navigate = useNavigate();
 
   const handleCrearRestricciones = (clienteId: string, proyectoId: string, clienteNombre: string, proyectoNombre: string) => {
+    console.log("Asignando clienteId y proyectoId al contexto");
+    setClienteId(clienteId);
+    setProyectoId(proyectoId);
+    console.log("Navegando al listado de restricciones");
     navigate(`/proyectos/${proyectoId}/restricciones`, {
       state: { clienteId, proyectoId, clienteNombre, proyectoNombre },
     });

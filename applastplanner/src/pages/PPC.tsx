@@ -1,10 +1,11 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import html2canvas from 'html2canvas';
 import jsPDF from 'jspdf';
 import GraficoRestricciones from '../components/GraficoRestricciones';
 import ResumenRestriccionesPorResponsable from '../components/ResumenRestriccionesPorResponsable';
 import { useAppContext } from '../components/Context'; // Importa el hook
 import { RestriccionesForm } from '../types/Restricciones'; // Importa el tipo
+
 // Función para formatear fechas a "DD/MM/YYYY"
 const formatDate = (dateString: string) => {
   const date = new Date(dateString);
@@ -17,7 +18,17 @@ const formatDate = (dateString: string) => {
 
 const PageWithPDF: React.FC = () => {
   // Usa el hook para acceder al contexto
-  const { restricciones } = useAppContext();
+  const { clienteId, proyectoId, getRestriccionesByProyecto } = useAppContext();
+
+  const [restriccionesFiltradas, setRestriccionesFiltradas] = useState<RestriccionesForm[]>([]);
+
+  // Obtener restricciones filtradas
+  useEffect(() => {
+    if (proyectoId) {
+      const filtradas = getRestriccionesByProyecto(proyectoId, clienteId || undefined);
+      setRestriccionesFiltradas(filtradas);
+    }
+  }, [proyectoId, clienteId, getRestriccionesByProyecto]);
 
   const handleDownloadPDF = async () => {
     const input = document.getElementById('pdf-content');
@@ -52,13 +63,13 @@ const PageWithPDF: React.FC = () => {
       {/* Contenedor de la página a convertir en PDF */}
       <div id="pdf-content" style={{ padding: '20px' }}>
         <h1 className="text-3xl font-bold mb-4">Informe de Restricciones</h1>
-        <GraficoRestricciones />
+        <GraficoRestricciones  />
         <ResumenRestriccionesPorResponsable />
 
         {/* Tabla de restricciones */}
         <div className="mt-6">
           <h2 className="text-2xl font-semibold mb-2">Listado de Restricciones</h2>
-          {restricciones.length > 0 ? (
+          {restriccionesFiltradas.length > 0 ? (
             <table className="min-w-full border-collapse border border-gray-300">
               <thead>
                 <tr className="bg-gray-200">
@@ -72,7 +83,7 @@ const PageWithPDF: React.FC = () => {
                 </tr>
               </thead>
               <tbody>
-                {restricciones.map((restriccion: RestriccionesForm) => (
+                {restriccionesFiltradas.map((restriccion: RestriccionesForm) => (
                   <tr key={restriccion._id || restriccion.id_restriccion}>
                     <td className="border border-gray-300 px-4 py-2">{restriccion.responsable}</td>
                     <td className="border border-gray-300 px-4 py-2">{restriccion.compromiso}</td>

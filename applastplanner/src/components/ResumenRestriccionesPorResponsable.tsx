@@ -1,5 +1,13 @@
 import React, { useEffect, useState } from 'react';
-import { Chart as ChartJS, CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend } from 'chart.js';
+import {
+  Chart as ChartJS,
+  CategoryScale,
+  LinearScale,
+  BarElement,
+  Title,
+  Tooltip,
+  Legend,
+} from 'chart.js';
 import { Bar } from 'react-chartjs-2';
 import { useAppContext } from '../components/Context';
 
@@ -14,28 +22,41 @@ interface Agrupacion {
 }
 
 const ResumenRestriccionesPorResponsable: React.FC = () => {
-  const { restricciones } = useAppContext();
+  const { clienteId, proyectoId, getRestriccionesByProyecto } = useAppContext();
   const [agrupacion, setAgrupacion] = useState<Agrupacion[]>([]);
 
   useEffect(() => {
-    if (restricciones.length > 0) {
-      const agrupacionPorResponsable = restricciones.reduce((acc: Record<string, Agrupacion>, restriccion) => {
-        const responsable = restriccion.responsable || 'Sin asignar';
-        if (!acc[responsable]) {
-          acc[responsable] = { responsable, total: 0, abiertas: 0, cerradas: 0 };
-        }
-        acc[responsable].total += 1;
-        if (restriccion.status === 'abierta') {
-          acc[responsable].abiertas += 1;
-        } else if (restriccion.status === 'cerrada') {
-          acc[responsable].cerradas += 1;
-        }
-        return acc;
-      }, {});
+    if (proyectoId) {
+      const restriccionesFiltradas = getRestriccionesByProyecto(proyectoId, clienteId || undefined);
+
+      // Procesar restricciones filtradas para agruparlas por responsable
+      const agrupacionPorResponsable = restriccionesFiltradas.reduce(
+        (acc: Record<string, Agrupacion>, restriccion) => {
+          const responsable = restriccion.responsable || 'Sin asignar';
+          if (!acc[responsable]) {
+            acc[responsable] = {
+              responsable,
+              total: 0,
+              abiertas: 0,
+              cerradas: 0,
+            };
+          }
+          acc[responsable].total += 1;
+          if (restriccion.status === 'abierta') {
+            acc[responsable].abiertas += 1;
+          } else if (restriccion.status === 'cerrada') {
+            acc[responsable].cerradas += 1;
+          }
+          return acc;
+        },
+        {}
+      );
 
       setAgrupacion(Object.values(agrupacionPorResponsable));
+    } else {
+      setAgrupacion([]);
     }
-  }, [restricciones]);
+  }, [proyectoId, clienteId, getRestriccionesByProyecto]);
 
   const chartData = {
     labels: agrupacion.map((item) => item.responsable),
@@ -93,18 +114,6 @@ const ResumenRestriccionesPorResponsable: React.FC = () => {
       <div className="relative" style={{ height: '400px' }}>
         <Bar data={chartData} options={chartOptions} />
       </div>
-      {/* <div className="mt-4">
-        {agrupacion.map((item) => (
-          <div key={item.responsable} className="p-2 border-b">
-            <p>
-              <strong>Responsable:</strong> {item.responsable}
-            </p>
-            <p>
-              <strong>Total:</strong> {item.total}, <strong>Abiertas:</strong> {item.abiertas}, <strong>Cerradas:</strong> {item.cerradas}
-            </p>
-          </div>
-        ))}
-      </div> */}
     </div>
   );
 };
