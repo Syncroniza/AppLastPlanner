@@ -1,7 +1,6 @@
 import { Types, Error } from "mongoose";
 const { ObjectId } = Types;
 import { RestriccionesModel } from "../models/restricciones.models.js";
-import { ClienteModel } from "../models/cliente.models.js";
 import { ProyectoModel } from "../models/proyecto.models.js";
 
 export function getAllRestriciones(req, res) {
@@ -16,8 +15,11 @@ export function getAllRestriciones(req, res) {
   }
 
   RestriccionesModel.find(filter)
+    .populate("responsable", "nombre apellido") // Poblar nombre y apellido del responsable
+    .populate("cliente", "nombre") // Poblar nombre del cliente
+    .populate("proyecto", "nombre") // Poblar nombre del proyecto
     .then((data) => {
-      console.log("Datos obtenidos:", data);
+      console.log("Datos obtenidos con población:", data);
       if (data.length === 0) {
         return res
           .status(404)
@@ -42,11 +44,9 @@ export function getOneRestricciones(req, res) {
     .populate("Cliente") // Población del cliente
     .then((data) => {
       if (data.length === 0) {
-        return res
-          .status(404)
-          .json({
-            message: "No se encontraron restricciones para este proyecto",
-          });
+        return res.status(404).json({
+          message: "No se encontraron restricciones para este proyecto",
+        });
       }
       res.json({ data });
     })
@@ -58,7 +58,9 @@ export function getOneRestricciones(req, res) {
 export async function getRestriccionesByProyecto(req, res) {
   const { proyectoId } = req.params;
   try {
-    const restricciones = await RestriccionesModel.find({ proyecto: proyectoId });
+    const restricciones = await RestriccionesModel.find({
+      proyecto: proyectoId,
+    });
     res.status(200).json({ data: restricciones });
   } catch (error) {
     console.error("Error al obtener restricciones:", error);
@@ -67,65 +69,73 @@ export async function getRestriccionesByProyecto(req, res) {
 }
 
 
+
 export async function createRestricciones(req, res) {
   try {
-    const { clienteId, proyectoId, ...rest } = req.body;
+    const { cliente, proyecto, responsable, ...rest } = req.body;
 
-    // Logs de depuración para verificar los IDs recibidos
-    console.log("Cliente ID recibido:", clienteId);
-    console.log("Proyecto ID recibido:", proyectoId);
+    console.log("Datos recibidos en la solicitud:", req.body);
 
-    // Verifica si el cliente existe
-    const cliente = await ClienteModel.findById(clienteId);
-    if (!cliente) {
-      console.log("Cliente no encontrado con ID:", clienteId); // Log de depuración
-      return res.status(404).json({ message: "Cliente no encontrado" });
-    }
-    console.log("Cliente encontrado:", cliente); // Log de depuración
-
-    // Verifica si el proyecto existe
-    const proyecto = await ProyectoModel.findById(proyectoId);
-    if (!proyecto) {
-      console.log("Proyecto no encontrado con ID:", proyectoId); // Log de depuración
-      return res.status(404).json({ message: "Proyecto no encontrado" });
-    }
-    console.log("Proyecto encontrado:", proyecto); // Log de depuración
-
-    // Verifica si el proyecto pertenece al cliente (opcional)
-    if (!proyecto.clienteId.equals(cliente._id)) {
-      console.log(
-        `El proyecto con ID ${proyectoId} no pertenece al cliente con ID ${clienteId}`
-      ); // Log de depuración
-      return res
-        .status(400)
-        .json({ message: "El proyecto no pertenece al cliente proporcionado" });
+    // Validar IDs
+    if (!ObjectId.isValid(cliente)) {
+      console.error("Cliente ID no válido:", cliente);
+      return res.status(400).json({ message: `Cliente ID no válido: ${cliente}` });
     }
 
-    // Encuentra el último documento y genera un nuevo ID basado en él
-    const lastRestriccion = await RestriccionesModel.findOne()
-      .sort({ id_restriccion: -1 })
-      .exec();
-    const newNumber = lastRestriccion
-      ? parseInt(lastRestriccion.id_restriccion.split("-")[1], 10) + 1
-      : 101;
-    const newId = `R-${newNumber}`;
+    if (!ObjectId.isValid(proyecto)) {
+      console.error("Proyecto ID no válido:", proyecto);
+      return res.status(400).json({ message: `Proyecto ID no válido: ${proyecto}` });
+    }
 
-    // Crea la nueva restricción con referencia a cliente y proyecto
+    if (!ObjectId.isValid(responsable)) {
+      console.error("Responsable ID no válido:", responsable);
+      return res.status(400).json({ message: `Responsable ID no válido: ${responsable}` });
+    }
+
+    // Validar cliente y proyecto en una sola consulta
+    const proyectoValido = await ProyectoModel.findOne({ _id: proyecto, cliente });
+    if (!proyectoValido) {
+      return res.status(400).json({ message: "El proyecto no pertenece al cliente proporcionado o no existe" });
+    }
+
+    // Validar campos adicionales
+    const camposPermitidos = [
+      "compromiso",
+      "centrocosto",
+      "fechacreacion",
+      "fechacompromiso",
+      "status",
+      "observaciones",
+      "cnc",
+      "nuevafecha",
+      "aliases",
+    ];
+    Object.keys(rest).forEach((key) => {
+      if (!camposPermitidos.includes(key)) {
+        console.warn(`Campo no permitido detectado: ${key}`);
+        delete rest[key];
+      }
+    });
+
+    // Crear nueva restricción
     const nuevaRestriccion = new RestriccionesModel({
-      id_restriccion: newId,
-      cliente: clienteId,
-      proyecto: proyectoId,
+      cliente,
+      proyecto,
+      responsable,
       ...rest,
     });
 
     const savedRestriccion = await nuevaRestriccion.save();
-    console.log("Restricción creada con éxito:", savedRestriccion); // Log de depuración
+    console.log("Restricción creada con éxito:", savedRestriccion);
     res.status(201).json({ data: savedRestriccion });
   } catch (error) {
     console.error("Error al crear la restricción:", error);
-    res.status(500).json({ error: "Error al crear la restricción" });
+    res.status(500).json({ error: error.message });
   }
 }
+
+
+
 
 export function deleteRestricciones(req, res) {
   let id = req.params.id;
@@ -139,11 +149,12 @@ export function deleteRestricciones(req, res) {
       res.status(500).json({ error: error });
     });
 }
+
 export function editRestricciones(req, res) {
-  console.log("Received update request for task ID:", req.params.id);
+  console.log("Received update request for restriction ID:", req.params.id);
   console.log("Request body:", req.body);
 
-  let id = req.params.id;
+  const id = req.params.id;
   let data = req.body;
 
   const updateOptions = {
@@ -152,10 +163,16 @@ export function editRestricciones(req, res) {
   };
 
   if (!ObjectId.isValid(id)) {
-    return res.status(400).json({ message: "Id do not match" });
+    return res.status(400).json({ message: "ID no válido" });
   }
 
-  // Actualiza todos los campos pasados en el cuerpo de la solicitud
+  // Verificar si el status cambia a "cerrada" para asignar la fecha de cierre automáticamente
+  if (data.status === "cerrada") {
+    data.fechaCierre = new Date(); // Asignar la fecha actual como fecha de cierre
+  } else if (data.status === "abierta") {
+    data.fechaCierre = null; // Si se reabre, eliminar la fecha de cierre
+  }
+
   RestriccionesModel.findByIdAndUpdate(id, data, updateOptions)
     .then((updatedDocument) => {
       if (!updatedDocument) {
@@ -166,12 +183,12 @@ export function editRestricciones(req, res) {
     .catch((error) => {
       console.error("Error al actualizar la restricción:", error);
       if (error.name === "ValidationError") {
-        let keys = Object.keys(error.errors);
-        let error_dict = {};
+        const keys = Object.keys(error.errors);
+        const errorDict = {};
         keys.forEach((key) => {
-          error_dict[key] = error.errors[key].message;
+          errorDict[key] = error.errors[key].message;
         });
-        res.status(400).json({ error: error_dict });
+        res.status(400).json({ error: errorDict });
       } else {
         res.status(500).json({ error: error.message || error });
       }

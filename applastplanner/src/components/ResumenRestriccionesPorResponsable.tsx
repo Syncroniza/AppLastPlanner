@@ -32,7 +32,11 @@ const ResumenRestriccionesPorResponsable: React.FC = () => {
       // Procesar restricciones filtradas para agruparlas por responsable
       const agrupacionPorResponsable = restriccionesFiltradas.reduce(
         (acc: Record<string, Agrupacion>, restriccion) => {
-          const responsable = restriccion.responsable || 'Sin asignar';
+          const responsable =
+            restriccion.responsable && restriccion.responsable.nombre && restriccion.responsable.apellido
+              ? `${restriccion.responsable.nombre} ${restriccion.responsable.apellido}`
+              : 'Sin asignar';
+
           if (!acc[responsable]) {
             acc[responsable] = {
               responsable,
@@ -110,8 +114,8 @@ const ResumenRestriccionesPorResponsable: React.FC = () => {
 
   return (
     <div className="w-full overflow-x-auto">
-      <h2 className="text-xl font-semibold mb-4">Resumen de Restricciones por Responsable</h2>
-      <div className="relative" style={{ height: '400px' }}>
+      <h2 className="text-xl font-semibold mb-4 text-center">Resumen de Restricciones por Responsable</h2>
+      <div className="relative" style={{ height: '400px', width: '100%' }}>
         <Bar data={chartData} options={chartOptions} />
       </div>
     </div>

@@ -8,6 +8,7 @@ interface ProyectoFormProps {
 
 const ProyectoForm: React.FC<ProyectoFormProps> = ({ onProyectoCreated }) => {
   const [clientes, setClientes] = useState<Cliente[]>([]);
+  console.log("clientes",clientes)
   const [formData, setFormData] = useState({
     nombre: '',
     descripcion: '',
@@ -37,6 +38,13 @@ const ProyectoForm: React.FC<ProyectoFormProps> = ({ onProyectoCreated }) => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+  
+    // Validar campos requeridos
+    if (!formData.clienteId) {
+      console.error('Error: Cliente ID faltante');
+      return alert('Por favor selecciona un cliente.');
+    }
+  
     try {
       const response = await API.post('/proyectos/', formData); // Usa el cliente configurado con el token
       if (response.status === 201 || response.status === 200) {
@@ -50,6 +58,7 @@ const ProyectoForm: React.FC<ProyectoFormProps> = ({ onProyectoCreated }) => {
       console.error('Error al crear el proyecto:', error);
     }
   };
+  
 
   return (
     <form onSubmit={handleSubmit} className="p-4 bg-white shadow-md rounded-md max-w-md mx-auto">

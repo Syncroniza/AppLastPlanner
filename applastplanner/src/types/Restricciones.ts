@@ -1,21 +1,23 @@
-import { Proyecto } from "../types/Proyecto";
-
+export interface Responsable {
+  _id: string;
+  nombre: string;
+  apellido: string;
+}
 
 export interface RestriccionesForm {
-  _id: string;
-  id_restriccion: string;
-  responsable: string;
+  _id:string;
+  responsable: Responsable;
   compromiso: string;
   centrocosto: string;
-  fechacreacion: string | null;
-  fechacompromiso: string | null;
-  nuevafecha: string | null;
-  cnc: string;
+  fechacreacion: string;
+  fechacompromiso: string;
   status: string;
   observaciones: string;
+  cnc: string;
+  nuevafecha: string;
   aliases: string[];
-  cliente: string; // ID del cliente
-  proyecto: string | Proyecto; // Puede ser un ID o un objeto poblado
+  cliente: string | null; // Permitir null
+  proyecto: string | null; // Permitir null
   createdAt: string;
   updatedAt: string;
 }

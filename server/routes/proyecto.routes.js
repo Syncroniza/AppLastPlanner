@@ -52,7 +52,11 @@ const proyectoRoutes = (app) => {
   
 
   // Ruta para crear un proyecto (solo administradores)
-  app.post("/proyectos/", authenticateJWT, checkRole("admin"), createProyecto);
+  app.post(
+    "/proyectos/", 
+    authenticateJWT, 
+    checkRole("admin"), 
+    createProyecto);
 
   // Ruta para actualizar un proyecto (admin o usuario con acceso explícito)
   app.patch(

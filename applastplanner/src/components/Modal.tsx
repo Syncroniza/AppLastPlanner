@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { useAppContext } from './Context';
 import { RestriccionesForm } from '../types/Restricciones';
+import API from '../api';
 
 interface ModalProps {
   isOpen: boolean;
@@ -49,7 +50,7 @@ const Modal: React.FC<ModalProps> = ({ isOpen, onClose, restriccion, onUpdate })
         nuevafecha: formData.nuevafecha ? new Date(`${formData.nuevafecha}T00:00:00`).toISOString() : null,
       };
 
-      const response = await axios.patch(`http://localhost:8000/restricciones/${formData._id}/`, adjustedData);
+      const response = await API.patch(`restricciones/${formData._id}/`, adjustedData);
       if (response.status === 200) {
         setRestricciones((prevRestricciones) =>
           prevRestricciones.map((r) => (r._id === formData._id ? formData : r))

@@ -1,7 +1,10 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
+import { useAppContext } from "../components/Context"
 
 const Sidebar: React.FC = () => {
+  const { logout } = useAppContext();
+
   const [isOpen, setIsOpen] = useState(false);
 
   const toggleSidebar = () => {
@@ -20,7 +23,7 @@ const Sidebar: React.FC = () => {
           <h2 className="text-2xl font-bold mb-4">Menu</h2>
           <ul>
             <li className="mb-2">
-              <Link to="/" className="block p-2 hover:bg-gray-700 rounded">
+              <Link to="/home" className="block p-2 hover:bg-gray-700 rounded">
                 Home
               </Link>
             </li>
@@ -34,17 +37,28 @@ const Sidebar: React.FC = () => {
                 Personal
               </Link>
             </li>
-            <li className="mb-2">
+            {/* <li className="mb-2">
               <Link to="/restricciones" className="block p-2 hover:bg-gray-700 rounded">
                 Restricciones
               </Link>
-            </li>
+            </li> */}
             <li className="mb-2">
               <Link to="/ppc" className="block p-2 hover:bg-gray-700 rounded">
                 PPC
               </Link>
             </li>
           </ul>
+          <div className="sidebar">
+      {/* Otros enlaces y opciones del Sidebar */}
+      <div className="mt-24">
+        <button
+          onClick={logout}
+          className="w-full bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded"
+        >
+          Logout
+        </button>
+      </div>
+    </div>
         </div>
       </div>
 
@@ -64,6 +78,7 @@ const Sidebar: React.FC = () => {
         {/* Icono de menú */}
         ☰
       </button>
+     
     </div>
   );
 };

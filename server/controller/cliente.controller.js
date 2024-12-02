@@ -1,19 +1,23 @@
 import { ClienteModel } from "../models/cliente.models.js";
 
 
-// / Obtener todos los clientes (restringido por rol)
+// Obtener todos los clientes (restringido por rol)
 export async function getAllClientes(req, res) {
   try {
     const { user } = req;
 
-    // Si el usuario es "admin", devuelve todos los clientes
+    let clientes;
+
     if (user.role === "admin") {
-      const clientes = await ClienteModel.find({});
-      return res.status(200).json({ data: clientes });
+      // Si el usuario es "admin", devuelve todos los clientes y sus proyectos
+      clientes = await ClienteModel.find({}).populate("proyectos");
+    } else {
+      // Si es "user", devuelve solo los clientes permitidos y sus proyectos
+      clientes = await ClienteModel.find({
+        _id: { $in: user.access.clientes },
+      }).populate("proyectos");
     }
 
-    // Si es "user", devuelve solo los clientes permitidos
-    const clientes = await ClienteModel.find({ _id: { $in: user.access.clientes } }).populate('proyectos');
     res.status(200).json({ data: clientes });
   } catch (error) {
     console.error("Error al obtener los clientes:", error);

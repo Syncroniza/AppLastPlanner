@@ -28,19 +28,12 @@ const restriccioesRoutes = (app) => {
 
   // Ruta para crear restricciones
   app.post(
-    "/restricciones/",
+    '/restricciones/',
     authenticateJWT,
-    (req, res, next) => {
-      if (req.user.role === "admin") {
-        console.log("Acceso permitido: Administrador puede crear restricciones");
-        return next(); // Administradores pueden crear restricciones
-      }
-      return res
-        .status(403)
-        .json({ error: "Acceso denegado: Solo los administradores pueden crear restricciones" });
-    },
+    checkRole(['admin', 'user']),
     createRestricciones
   );
+
 
   // Ruta para eliminar una restricción
   app.delete(
@@ -62,15 +55,7 @@ const restriccioesRoutes = (app) => {
   app.patch(
     "/restricciones/:id/",
     authenticateJWT,
-    (req, res, next) => {
-      if (req.user.role === "admin") {
-        console.log("Acceso permitido: Administrador puede editar restricciones");
-        return next();
-      }
-      return res
-        .status(403)
-        .json({ error: "Acceso denegado: Solo los administradores pueden editar restricciones" });
-    },
+    checkRole(["admin", "user"]), // Admin y user pueden editar restricciones
     editRestricciones
   );
 };

@@ -3,10 +3,9 @@ import html2canvas from 'html2canvas';
 import jsPDF from 'jspdf';
 import GraficoRestricciones from '../components/GraficoRestricciones';
 import ResumenRestriccionesPorResponsable from '../components/ResumenRestriccionesPorResponsable';
-import { useAppContext } from '../components/Context'; // Importa el hook
-import { RestriccionesForm } from '../types/Restricciones'; // Importa el tipo
+import { useAppContext } from '../components/Context'; 
+import { RestriccionesForm } from '../types/Restricciones'; 
 
-// Función para formatear fechas a "DD/MM/YYYY"
 const formatDate = (dateString: string) => {
   const date = new Date(dateString);
   return new Intl.DateTimeFormat('es-ES', {
@@ -17,19 +16,19 @@ const formatDate = (dateString: string) => {
 };
 
 const PageWithPDF: React.FC = () => {
-  // Usa el hook para acceder al contexto
   const { clienteId, proyectoId, getRestriccionesByProyecto } = useAppContext();
-
   const [restriccionesFiltradas, setRestriccionesFiltradas] = useState<RestriccionesForm[]>([]);
 
-  // Obtener restricciones filtradas
   useEffect(() => {
     if (proyectoId) {
-      const filtradas = getRestriccionesByProyecto(proyectoId, clienteId || undefined);
-      setRestriccionesFiltradas(filtradas);
+      const todasLasRestricciones = getRestriccionesByProyecto(proyectoId, clienteId || undefined);
+      const restriccionesAbiertas = todasLasRestricciones.filter(
+        (restriccion: RestriccionesForm) => restriccion.status === 'abierta'
+      );
+      setRestriccionesFiltradas(restriccionesAbiertas);
     }
   }, [proyectoId, clienteId, getRestriccionesByProyecto]);
-
+  
   const handleDownloadPDF = async () => {
     const input = document.getElementById('pdf-content');
     if (input) {
@@ -52,7 +51,7 @@ const PageWithPDF: React.FC = () => {
   };
 
   return (
-    <div>
+    <div className="flex flex-col items-center w-full p-4 bg-gray-200">
       <button
         onClick={handleDownloadPDF}
         className="mb-4 px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
@@ -60,16 +59,22 @@ const PageWithPDF: React.FC = () => {
         Descargar PDF
       </button>
 
-      {/* Contenedor de la página a convertir en PDF */}
-      <div id="pdf-content" style={{ padding: '20px' }}>
-        <h1 className="text-3xl font-bold mb-4">Informe de Restricciones</h1>
-        <GraficoRestricciones  />
-        <ResumenRestriccionesPorResponsable />
+      <div id="pdf-content" className="w-full max-w-4xl p-4 bg-blue-200 shadow-md rounded-lg">
+        <h1 className="text-3xl font-bold text-center mb-6">Informe de Restricciones</h1>
 
-        {/* Tabla de restricciones */}
-        <div className="mt-6">
-          <h2 className="text-2xl font-semibold mb-2">Listado de Restricciones</h2>
-          {restriccionesFiltradas.length > 0 ? (
+        {/* Contenedor de los gráficos centrados */}
+        <div className="flex flex-col items-center mb-6 space-y-6">
+          <div className="w-full max-w-md">
+            <GraficoRestricciones />
+          </div>
+          <div className="w-full max-w-md">
+            <ResumenRestriccionesPorResponsable />
+          </div>
+        </div>
+
+        <h2 className="text-2xl font-semibold mb-4 text-center">Listado de Restricciones</h2>
+        {restriccionesFiltradas.length > 0 ? (
+          <div className="overflow-x-auto w-full">
             <table className="min-w-full border-collapse border border-gray-300">
               <thead>
                 <tr className="bg-gray-200">
@@ -84,8 +89,12 @@ const PageWithPDF: React.FC = () => {
               </thead>
               <tbody>
                 {restriccionesFiltradas.map((restriccion: RestriccionesForm) => (
-                  <tr key={restriccion._id || restriccion.id_restriccion}>
-                    <td className="border border-gray-300 px-4 py-2">{restriccion.responsable}</td>
+                  <tr key={restriccion._id}>
+                    <td className="border border-gray-300 px-4 py-2">
+                      {restriccion.responsable
+                        ? `${restriccion.responsable.nombre} ${restriccion.responsable.apellido}`
+                        : 'No asignado'}
+                    </td>
                     <td className="border border-gray-300 px-4 py-2">{restriccion.compromiso}</td>
                     <td className="border border-gray-300 px-4 py-2">
                       {formatDate(restriccion.fechacreacion)}
@@ -102,10 +111,10 @@ const PageWithPDF: React.FC = () => {
                 ))}
               </tbody>
             </table>
-          ) : (
-            <p>No hay restricciones disponibles.</p>
-          )}
-        </div>
+          </div>
+        ) : (
+          <p className="text-center">No hay restricciones disponibles.</p>
+        )}
       </div>
     </div>
   );

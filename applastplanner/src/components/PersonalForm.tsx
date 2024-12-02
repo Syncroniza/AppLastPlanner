@@ -1,92 +1,193 @@
-import axios from 'axios';
-import React, { useState } from 'react';
-import {BASE_URL} from "../constants.ts";
+import React, { useState, useEffect } from "react";
+import { useAppContext } from "../components/Context";
+import API from "../api";
 
 interface TeamMember {
-  id: string;
   nombre: string;
   apellido: string;
   empresa: string;
-  telefono: string;
   correo: string;
   cargo: string;
+  cliente: string;
+  proyecto: string;
 }
 
 const FormularioEquipo: React.FC = () => {
+  const {
+    clienteId,
+    setClienteId,
+    proyectoId,
+    setProyectoId,
+    clientes,
+    proyectos,
+    equipoData,
+    setEquipoData,
+  } = useAppContext();
+
   const [formData, setFormData] = useState<TeamMember>({
-    id: '',
-    nombre: '',
-    apellido: '',
-    empresa: '',
-    telefono: '',
-    correo: '',
-    cargo: '',
+    nombre: "",
+    apellido: "",
+    empresa: "",
+    correo: "",
+    cargo: "",
+    cliente: clienteId || "",
+    proyecto: proyectoId || "",
   });
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  useEffect(() => {
+    // Sincronizar el clienteId y proyectoId del contexto con el estado del formulario
+    setFormData((prev) => ({
+      ...prev,
+      cliente: clienteId || "",
+      proyecto: proyectoId || "",
+    }));
+  }, [clienteId, proyectoId]);
+
+  const handleChange = (
+    e: React.ChangeEvent<HTMLSelectElement | HTMLInputElement>
+  ) => {
     const { name, value } = e.target;
-    setFormData({ ...formData, [name]: value });
+
+    if (name === "cliente") {
+      setClienteId(value);
+    } else if (name === "proyecto") {
+      setProyectoId(value);
+    }
+
+    setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
     try {
-        const response = await axios.post(BASE_URL + '/equipo/', formData);
-      
-      if (response.status === 200 || response.status === 201) {
-        console.log('Datos enviados correctamente');
-        // Limpia el formulario o muestra un mensaje de éxito
-        setFormData({
-          id: '',
-          nombre: '',
-          apellido: '',
-          empresa: '',
-          telefono: '',
-          correo: '',
-          cargo: '',
-        });
-      } else {
-        console.error('Error al enviar los datos');
-      }
+      const response = await API.post("/equipo", formData);
+      console.log("Equipo agregado:", response.data);
+      setEquipoData([...equipoData, response.data]);
     } catch (error) {
-      console.error('Error de red o en la solicitud:', error);
+      console.error("Error al agregar el equipo:", error);
     }
   };
 
   return (
-    <form onSubmit={handleSubmit} className="flex flex-wrap items-center gap-4">
-      <div className="flex flex-col">
-        <label className="mb-1 font-medium">ID:</label>
-        <input type="text" name="id" value={formData.id} onChange={handleChange} required className="border p-1 rounded" />
+    <form onSubmit={handleSubmit} className="flex flex-wrap gap-4 bg-gray-200 rounded-lg m-2">
+      <div className="flex-1">
+        <label htmlFor="nombre" className="block font-medium mb-1">
+          Nombre:
+        </label>
+        <input
+          type="text"
+          id="nombre"
+          name="nombre"
+          value={formData.nombre}
+          onChange={handleChange}
+          required
+          className="w-full border p-2 rounded ml-2"
+        />
       </div>
-      <div className="flex flex-col">
-        <label className="mb-1 font-medium">Nombre:</label>
-        <input type="text" name="nombre" value={formData.nombre} onChange={handleChange} required className="border p-1 rounded" />
+      <div className="flex-1">
+        <label htmlFor="apellido" className="block font-medium mb-1">
+          Apellido:
+        </label>
+        <input
+          type="text"
+          id="apellido"
+          name="apellido"
+          value={formData.apellido}
+          onChange={handleChange}
+          required
+          className="w-full border p-2 rounded"
+        />
       </div>
-      <div className="flex flex-col">
-        <label className="mb-1 font-medium">Apellido:</label>
-        <input type="text" name="apellido" value={formData.apellido} onChange={handleChange} required className="border p-1 rounded" />
+      <div className="flex-1">
+        <label htmlFor="empresa" className="block font-medium mb-1">
+          Empresa:
+        </label>
+        <input
+          type="text"
+          id="empresa"
+          name="empresa"
+          value={formData.empresa}
+          onChange={handleChange}
+          required
+          className="w-full border p-2 rounded"
+        />
       </div>
-      <div className="flex flex-col">
-        <label className="mb-1 font-medium">Teléfono:</label>
-        <input type="tel" name="telefono" value={formData.telefono} onChange={handleChange} required className="border p-1 rounded" />
+      <div className="flex-1">
+        <label htmlFor="correo" className="block font-medium mb-1">
+          Correo:
+        </label>
+        <input
+          type="email"
+          id="correo"
+          name="correo"
+          value={formData.correo}
+          onChange={handleChange}
+          required
+          className="w-full border p-2 rounded"
+        />
       </div>
-      <div className="flex flex-col">
-        <label className="mb-1 font-medium">Correo:</label>
-        <input type="email" name="correo" value={formData.correo} onChange={handleChange} required className="border p-1 rounded" />
+      <div className="flex-1">
+        <label htmlFor="cargo" className="block font-medium mb-1">
+          Cargo:
+        </label>
+        <input
+          type="text"
+          id="cargo"
+          name="cargo"
+          value={formData.cargo}
+          onChange={handleChange}
+          required
+          className="w-full border p-2 rounded"
+        />
       </div>
-      <div className="flex flex-col">
-        <label className="mb-1 font-medium">Cargo:</label>
-        <input type="text" name="cargo" value={formData.cargo} onChange={handleChange} required className="border p-1 rounded" />
+      <div className="flex-1">
+        <label htmlFor="cliente" className="block font-medium mb-1">
+          Cliente:
+        </label>
+        <select
+          id="cliente"
+          name="cliente"
+          value={formData.cliente}
+          onChange={handleChange}
+          required
+          className="w-full border p-2 rounded"
+        >
+          <option value="">Seleccione un cliente</option>
+          {clientes.map((cliente) => (
+            <option key={cliente._id} value={cliente._id}>
+              {cliente.nombre}
+            </option>
+          ))}
+        </select>
       </div>
-      <div className="flex flex-col">
-        <label className="mb-1 font-medium">Empresa:</label>
-        <input type="text" name="empresa" value={formData.empresa} onChange={handleChange} required className="border p-1 rounded" />
+      <div className="flex-1 mr-2">
+        <label htmlFor="proyecto" className="block font-medium mb-1 mr-2">
+          Proyecto:
+        </label>
+        <select
+          id="proyecto"
+          name="proyecto"
+          value={formData.proyecto}
+          onChange={handleChange}
+          required
+          className="w-full border p-2 rounded mr-2 "
+        >
+          <option value="">Seleccione un proyecto</option>
+          {proyectos.map((proyecto) => (
+            <option key={proyecto._id} value={proyecto._id}>
+              {proyecto.nombre}
+            </option>
+          ))}
+        </select>
       </div>
-      <button type="submit" className="bg-blue-500 text-white py-2 px-4 rounded hover:bg-blue-600">
-        Enviar
-      </button>
+      <div className="w-full mt-4">
+        <button
+          type="submit"
+          className="bg-blue-500 text-white py-2 px-4 rounded hover:bg-blue-600 w-full"
+        >
+          Guardar
+        </button>
+      </div>
     </form>
   );
 };

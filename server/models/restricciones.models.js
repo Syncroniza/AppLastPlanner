@@ -2,11 +2,10 @@ import mongoose from "mongoose";
 
 const RestriccionesSchema = new mongoose.Schema(
   {
-    id_restriccion: {
-      type: String,
-    },
+    
     responsable: {
-      type: String,
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "crew", // Referencia al modelo Equipo
     },
     compromiso: {
       type: String,
@@ -22,6 +21,8 @@ const RestriccionesSchema = new mongoose.Schema(
     },
     status: {
       type: String,
+      enum: ["abierta", "cerrada"], // Solo permite estos dos estados
+      required: true,
     },
     observaciones: {
       type: String,
@@ -32,6 +33,9 @@ const RestriccionesSchema = new mongoose.Schema(
     nuevafecha: {
       type: Date,
     },
+    fechaCierre: {
+      type: Date, // Fecha automática cuando se marca como cerrada
+    },
     aliases: [
       {
         type: String,
@@ -39,12 +43,12 @@ const RestriccionesSchema = new mongoose.Schema(
     ],
     proyecto: {
       type: mongoose.Schema.Types.ObjectId,
-      ref: "proyecto", // Referencia a un proyecto
+      ref: "Proyecto", // Referencia a un proyecto
       required: true,
     },
     cliente: {
       type: mongoose.Schema.Types.ObjectId,
-      ref: "cliente", // Referencia a un cliente
+      ref: "Cliente", // Referencia a un cliente
       required: true,
     },
   },
@@ -54,6 +58,7 @@ const RestriccionesSchema = new mongoose.Schema(
 );
 
 export const RestriccionesModel = mongoose.model(
-  "restricciones",
+  "Restriccion",
   RestriccionesSchema
 );
+

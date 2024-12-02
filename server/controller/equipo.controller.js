@@ -6,6 +6,8 @@ export function getAllEquipo(req, res) {
   console.log("Solicitud recibida en /desglosegg/");
   EquipoModel
     .find({})
+    .populate("proyecto") // Poblamos el campo `proyecto`
+    .populate("cliente") // Poblamos el campo `cliente`
     .then((data) => {
       console.log("Datos obtenidos:", data);
       if (data.length === 0) {
@@ -18,6 +20,7 @@ export function getAllEquipo(req, res) {
       res.status(500).json({ error: error.message || error });
     });
 }
+
 
 
 export function getOneEquipo(req, res) {

@@ -56,12 +56,19 @@ export const checkAccessToEntity = (entityType) => {
 
     console.log(`Verificando acceso para: ${entityType}`);
     console.log(`ID solicitado: ${entityId}`);
+
+    // Si el usuario es administrador, permitir acceso completo
+    if (user.role === 'admin') {
+      console.log(`Acceso total otorgado al administrador para ${entityType}`);
+      return next();
+    }
+
     console.log(`IDs permitidos:`, user.access[entityType]);
 
-    // Convertir los IDs permitidos a cadenas para evitar problemas de comparación
-    const permittedIds = user.access[entityType].map((id) => id.toString());
+    // Si no es administrador, validar los accesos específicos
+    const permittedIds = user.access[entityType]?.map((id) => id.toString()) || [];
 
-    if (!permittedIds.includes(entityId.toString())) {
+    if (!permittedIds.includes(entityId?.toString())) {
       return res.status(403).json({
         error: `Acceso denegado: no tienes permiso para este ${entityType}`,
       });
@@ -71,3 +78,4 @@ export const checkAccessToEntity = (entityType) => {
     next();
   };
 };
+

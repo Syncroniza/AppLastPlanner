@@ -1,3 +1,5 @@
+// App.tsx
+
 import React from 'react';
 import { BrowserRouter as Router, Route, Routes, Navigate } from 'react-router-dom';
 import Sidebar from './components/SideBar';
@@ -12,14 +14,13 @@ import ProtectedRoute from './services/ProtectedRoute';
 import { AppProvider } from './components/Context';
 
 const App: React.FC = () => {
-  
   return (
-    <AppProvider>
-      <Router>
+    <Router>
+      <AppProvider>
         <Routes>
           {/* Redirección predeterminada siempre a login */}
           <Route path="/" element={<Navigate to="/login" />} />
-          
+
           {/* Rutas públicas */}
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<Register />} />
@@ -103,8 +104,8 @@ const App: React.FC = () => {
             }
           />
         </Routes>
-      </Router>
-    </AppProvider>
+      </AppProvider>
+    </Router>
   );
 };
 

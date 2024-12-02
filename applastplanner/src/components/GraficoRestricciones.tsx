@@ -15,6 +15,9 @@ const GraficoRestricciones: React.FC = () => {
   const { getRestriccionesByProyecto, proyectoId, clienteId } = useAppContext();
   const [restriccionesFiltradas, setRestriccionesFiltradas] = useState<any[]>([]);
 
+  console.log('Restricciones para el gráfico:', restriccionesFiltradas);
+  
+
   // Obtener las restricciones filtradas desde el contexto
   useEffect(() => {
     if (proyectoId) {
@@ -25,13 +28,12 @@ const GraficoRestricciones: React.FC = () => {
     }
   }, [proyectoId, clienteId, getRestriccionesByProyecto]);
 
-  console.log('Restricciones para el gráfico:', restriccionesFiltradas);
 
   // Verificar si restriccionesFiltradas es válida y no está vacía
   if (!restriccionesFiltradas || restriccionesFiltradas.length === 0) {
     return (
-      <div style={{ width: '25%', margin: '0 auto' }}>
-        <h2 className="text-2xl font-bold mb-4">Resumen de Restricciones</h2>
+      <div style={{ width: '100%', margin: '0 auto' }}>
+        <h2 className="text-xl font-bold mb-4">Resumen de Restricciones</h2>
         <p className="mt-4 text-xl">No hay restricciones disponibles para graficar.</p>
       </div>
     );
@@ -57,9 +59,8 @@ const GraficoRestricciones: React.FC = () => {
   };
 
   return (
-    <div style={{ width: '25%', margin: '0 auto' }}>
-      <h2 className="text-2xl font-bold mb-4">Resumen de Restricciones</h2>
-      <p className="mt-4 text-2xl font-semibold">Total de restricciones: {total}</p>
+    <div style={{ width: '80%', margin: '0 auto' }}>
+      <p className="mt-4 text-xl font-semibold text-center">Total de restricciones: {total}</p>
       <Pie data={data} />
     </div>
   );

@@ -4,6 +4,7 @@ import { RestriccionesForm } from '../types/Restricciones';
 import { Cliente } from '../types/Cliente';
 import { Proyecto } from '../types/Proyecto';
 import API from '../api';
+import { useNavigate } from 'react-router-dom';
 
 interface AppContextProps {
   clienteId: string | null;
@@ -20,8 +21,10 @@ interface AppContextProps {
   setRestricciones: React.Dispatch<React.SetStateAction<RestriccionesForm[]>>;
   fetchRestricciones: () => Promise<void>;
   getRestriccionesByProyecto: (proyectoId: string, clienteId?: string) => RestriccionesForm[];
+  logout: () => void;
   
 }
+
 
 const AppContext = createContext<AppContextProps | undefined>(undefined);
 
@@ -32,8 +35,14 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
   console.log("contextProyectID",proyectoId)
   const [clientes, setClientes] = useState<Cliente[]>([]);
   const [proyectos, setProyectos] = useState<Proyecto[]>([]);
+  console.log("proyectoscontext",proyectos)
   const [equipoData, setEquipoData] = useState<Personal[]>([]);
+  console.log("equipoData",equipoData)
   const [restricciones, setRestricciones] = useState<RestriccionesForm[]>([]);
+  console.log("restricciones",restricciones)
+
+  // Inicializar navigate para redireccionar
+  const navigate = useNavigate();
   
 
   // Función para obtener restricciones desde el backend
@@ -47,11 +56,33 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
     }
   };
 
+  // Función para cerrar sesión
+  const logout = () => {
+    setClienteId(null);
+    setProyectoId(null);
+    setClientes([]);
+    setProyectos([]);
+    setEquipoData([]);
+    setRestricciones([]);
+    localStorage.removeItem('authToken'); // Limpiar token de autenticación si se usa uno
+    navigate('/login'); // Redirigir al login
+  };
+
   // Función para filtrar restricciones por proyectoId (y opcionalmente clienteId)
   const getRestriccionesByProyecto = (proyectoId: string, clienteId?: string): RestriccionesForm[] => {
     return restricciones.filter((restriccion) => {
-      const matchProyecto = restriccion.proyecto?.toString().trim() === proyectoId.trim();
-      const matchCliente = clienteId ? restriccion.cliente?.toString().trim() === clienteId.trim() : true;
+      // Verificar si `proyecto` es un string o un objeto, y asegurarse de que no sea `null`
+      const matchProyecto =
+        restriccion.proyecto &&
+        ((typeof restriccion.proyecto === 'string' && restriccion.proyecto.trim() === proyectoId.trim()) ||
+          (typeof restriccion.proyecto === 'object' && restriccion.proyecto._id?.toString().trim() === proyectoId.trim()));
+  
+      // Verificar si `cliente` es un string o un objeto, y asegurarse de que no sea `null`
+      const matchCliente = clienteId
+        ? restriccion.cliente &&
+          ((typeof restriccion.cliente === 'string' && restriccion.cliente.trim() === clienteId.trim()) ||
+            (typeof restriccion.cliente === 'object' && restriccion.cliente._id?.toString().trim() === clienteId.trim()))
+        : true;
   
       console.log("Comparando restricción:", restriccion);
       console.log("matchProyecto:", matchProyecto, "matchCliente:", matchCliente);
@@ -59,6 +90,9 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
       return matchProyecto && matchCliente;
     });
   };
+  
+  
+  
   
 
   useEffect(() => {
@@ -75,6 +109,7 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
     const fetchProyectos = async () => {
       try {
         const response = await API.get('/proyectos/');
+        console.log("resoonseprojectos",response)
         setProyectos(response.data.data);
       } catch (error) {
         console.error('Error al obtener los proyectos:', error);
@@ -113,6 +148,7 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
         setClienteId,
         proyectoId,
         setProyectoId,
+        logout,
       }}
     >
       {children}
