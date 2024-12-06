@@ -25,30 +25,26 @@ const proyectoRoutes = (app) => {
     "/proyectos/:id/",
     authenticateJWT,
     (req, res, next) => {
-      console.log("Usuario autenticado:", req.user);
-  
-      // Verificar acceso explícito
       const { access } = req.user;
       const projectId = req.params.id;
   
-      console.log("Verificando acceso a proyectos...");
-      console.log("IDs permitidos:", access.proyectos);
-      console.log("ID solicitado:", projectId);
+      if (!access || !access.proyectos) {
+        return res
+          .status(403)
+          .json({ error: "Acceso denegado: no tienes permisos para ningún proyecto" });
+      }
   
       if (access.proyectos.includes(projectId)) {
-        console.log("Acceso permitido al proyecto:", projectId);
         return next();
       }
   
-      console.log("Acceso denegado al proyecto:", projectId);
       return res
         .status(403)
-        .json({ error: `Acceso denegado: no tienes permiso para este proyecto` });
+        .json({ error: `Acceso denegado: no tienes permiso para el proyecto ${projectId}` });
     },
-    (req, res) => {
-      res.status(200).json({ message: "Acceso exitoso al proyecto" });
-    }
+    getProyectoById // Este debería ser tu controlador real para obtener los detalles del proyecto
   );
+  
   
 
   // Ruta para crear un proyecto (solo administradores)

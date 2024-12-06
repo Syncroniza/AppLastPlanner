@@ -5,9 +5,10 @@ import Modal from './Modal'; // Asegúrate de que la ruta de importación sea co
 import { RestriccionesForm } from '../types/Restricciones';
 import * as XLSX from 'xlsx';
 import API from '../api';
+import { format, addDays } from 'date-fns';
 
 const ListadoRestricciones: React.FC = () => {
-  const { restricciones, getRestriccionesByProyecto, } = useAppContext();
+  const { restricciones, getRestriccionesByProyecto, updateRestriccionInContext } = useAppContext();
 
   const location = useLocation();
   const { clienteId, proyectoId } = location.state || {}; // Extrae clienteId y proyectoId del estado
@@ -16,19 +17,36 @@ const ListadoRestricciones: React.FC = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedRestriccion, setSelectedRestriccion] = useState<RestriccionesForm | null>(null);
   const [sortConfig, setSortConfig] = useState<{ key: string; direction: 'asc' | 'desc' } | null>(null);
+  const [updateMessage, setUpdateMessage] = useState<string | null>(null);
+  const [isLoading, setIsLoading] = useState(false);
 
-  // Verifica y filtra las restricciones basadas en proyectoId y clienteId
+
+  const fetchRestricciones = async () => {
+    if (proyectoId && clienteId) {
+      try {
+        const restriccionesFiltradas = getRestriccionesByProyecto(proyectoId, clienteId);
+        console.log("Restricciones obtenidas:", restriccionesFiltradas);
+        if (restriccionesFiltradas && restriccionesFiltradas.length > 0) {
+          setFilteredRestricciones(restriccionesFiltradas);
+        } else {
+          console.warn("No se obtuvieron restricciones.");
+          setFilteredRestricciones([]); // Limpia el estado si no hay datos
+        }
+      } catch (error) {
+        console.error("Error al obtener restricciones:", error);
+      }
+    } else {
+      console.warn("No se recibieron proyectoId o clienteId para filtrar restricciones");
+    }
+  };
   useEffect(() => {
-  console.log("proyectoId recibido en el gráfico:", proyectoId);
-  console.log("clienteId recibido en el gráfico:", clienteId);
-  
-  if (proyectoId) {
-    const restriccionesFiltradas = getRestriccionesByProyecto(proyectoId, clienteId);
-    setFilteredRestricciones(restriccionesFiltradas);
-  } else {
-    console.warn("No se recibió proyectoId para filtrar restricciones");
-  }
-}, [proyectoId, clienteId, getRestriccionesByProyecto]);
+    if (proyectoId && clienteId) {
+      fetchRestricciones(); // Llama a la función para filtrar restricciones
+    } else {
+      console.warn("proyectoId o clienteId no están disponibles");
+    }
+  }, [proyectoId, clienteId, getRestriccionesByProyecto]);
+
 
 
   // Ordena las restricciones
@@ -63,7 +81,10 @@ const ListadoRestricciones: React.FC = () => {
   const handleModalClose = () => {
     setIsModalOpen(false);
   };
+
+
   const handleCheckboxChange = async (restriccion: RestriccionesForm) => {
+    setIsLoading(true);
     try {
       const updatedData = {
         ...restriccion,
@@ -71,16 +92,25 @@ const ListadoRestricciones: React.FC = () => {
         nuevafecha: new Date().toISOString(), // Establece la fecha actual como fecha de cierre
       };
 
+      // Actualización optimista
+      updateRestriccionInContext(updatedData);
+
+      setUpdateMessage('Restricción actualizada exitosamente'); // Mensaje temporal
+
+      setTimeout(() => {
+        setUpdateMessage(null); // Ocultar el mensaje después de 3 segundos
+      }, 3000);
+
       const response = await API.patch(`/restricciones/${restriccion._id}`, updatedData);
-      if (response.status === 200) {
-        setFilteredRestricciones((prev) =>
-          prev.map((r) => (r._id === restriccion._id ? { ...r, ...updatedData } : r))
-        );
+      if (response.status !== 200) {
+        fetchRestricciones(); // Revertir en caso de error
       }
     } catch (error) {
       console.error('Error al actualizar la restricción:', error);
+      fetchRestricciones(); // Revertir en caso de error
     }
   };
+
 
   const handleExportToExcel = () => {
     const dataToExport = filteredRestricciones.map((restriccion) => ({
@@ -89,11 +119,11 @@ const ListadoRestricciones: React.FC = () => {
       centrocosto: restriccion.centrocosto,
       fechacreacion: restriccion.fechacreacion
         ? new Date(new Date(restriccion.fechacreacion).getTime() - new Date().getTimezoneOffset() * 60000)
-            .toLocaleDateString('es-ES', { day: '2-digit', month: '2-digit', year: '2-digit' })
+          .toLocaleDateString('es-ES', { day: '2-digit', month: '2-digit', year: '2-digit' })
         : '',
       fechacompromiso: restriccion.fechacompromiso
         ? new Date(new Date(restriccion.fechacompromiso).getTime() - new Date().getTimezoneOffset() * 60000)
-            .toLocaleDateString('es-ES', { day: '2-digit', month: '2-digit', year: '2-digit' })
+          .toLocaleDateString('es-ES', { day: '2-digit', month: '2-digit', year: '2-digit' })
         : '',
       status: restriccion.status,
     }));
@@ -113,6 +143,29 @@ const ListadoRestricciones: React.FC = () => {
       >
         Exportar a Excel
       </button>
+      {/* <button
+        onClick={fetchRestricciones}
+        className="mb-4 ml-4 bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
+      >
+        Guardar Cambios
+      </button> */}
+      {updateMessage && (
+        <div className="mb-4 p-2 text-white bg-green-500 rounded flex items-center">
+          {updateMessage}
+          {isLoading && (
+            <div className="ml-4">
+              <div className="animate-spin h-6 w-6 border-4 border-t-transparent border-white rounded-full"></div>
+            </div>
+          )}
+        </div>
+      )}
+      <button
+        onClick={fetchRestricciones}
+        className="mb-4 ml-6 bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
+      >
+        Cargar Restricciones
+      </button>
+
       <table className="min-w-full bg-white border border-gray-200">
         <thead>
           <tr className="bg-gray-100">
@@ -145,31 +198,31 @@ const ListadoRestricciones: React.FC = () => {
                   <button
                     onClick={() => handleCheckboxChange(restriccion)}
                     disabled={restriccion.status === 'cerrada'} // Deshabilita si ya está cerrada
-                    className={`px-4 py-2 text-white font-semibold rounded ${
-                      restriccion.status === 'cerrada'
-                        ? 'bg-gray-400 cursor-not-allowed'
-                        : 'bg-red-500 hover:bg-red-600'
-                    }`}
+                    className={`px-4 py-2 text-white font-semibold rounded ${restriccion.status === 'cerrada'
+                      ? 'bg-gray-400 cursor-not-allowed'
+                      : 'bg-red-500 hover:bg-red-600'
+                      }`}
                   >
                     {restriccion.status === 'cerrada' ? 'Cerrada' : 'Cerrar'}
                   </button>
                 </td>
                 <td className="px-4 py-2 border-b">
-                  {restriccion.responsable
+                  {typeof restriccion.responsable === 'object' && restriccion.responsable !== null
                     ? `${restriccion.responsable.nombre} ${restriccion.responsable.apellido}`
-                    : 'No asignado'}
+                    : restriccion.responsable || 'No asignado'}
                 </td>
+
                 <td className="px-4 py-2 border-b">{restriccion.compromiso}</td>
                 <td className="px-4 py-2 border-b">{restriccion.centrocosto}</td>
-                <td className="px-4 py-2 border-b">
+                <td className="py-2">
                   {restriccion.fechacreacion
-                    ? new Date(restriccion.fechacreacion).toLocaleDateString('es-ES')
-                    : 'N/A'}
+                    ? format(addDays(new Date(restriccion.fechacreacion), 1), 'dd/MM/yyyy')
+                    : ''}
                 </td>
-                <td className="px-4 py-2 border-b">
+                <td className="py-2">
                   {restriccion.fechacompromiso
-                    ? new Date(restriccion.fechacompromiso).toLocaleDateString('es-ES')
-                    : 'N/A'}
+                    ? format(addDays(new Date(restriccion.fechacompromiso), 1), 'dd/MM/yyyy')
+                    : ''}
                 </td>
                 <td className="px-4 py-2 border-b">
                   {restriccion.nuevafecha
@@ -189,16 +242,13 @@ const ListadoRestricciones: React.FC = () => {
             ))
           ) : (
             <tr>
-      <td colSpan={9} className="px-4 py-2 border-b text-center">
-        No hay restricciones para este proyecto.
-      </td>
-    </tr>
-  )}
-</tbody>
-
-
+              <td colSpan={9} className="px-4 py-2 border-b text-center">
+                No hay restricciones para este proyecto.
+              </td>
+            </tr>
+          )}
+        </tbody>
       </table>
-
       {isModalOpen && (
         <Modal
           isOpen={isModalOpen}

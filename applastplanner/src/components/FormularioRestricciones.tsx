@@ -7,11 +7,10 @@ import { Personal } from "../types/Personal";
 import API from "../api";
 
 const FormularioRestricciones: React.FC = () => {
-  
+
   const location = useLocation();
-  const { clienteId, proyectoId, clienteNombre, proyectoNombre } =
-    location.state || {};
-  const { equipoData, setRestricciones } = useAppContext();
+  const { clienteId, proyectoId, clienteNombre, proyectoNombre } = location.state || {};
+  const { equipoData, setRestricciones, getRestriccionesByProyecto } = useAppContext();
 
   const [formData, setFormData] = useState<RestriccionesForm>({
     responsable: "",
@@ -47,45 +46,49 @@ const FormularioRestricciones: React.FC = () => {
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>
   ) => {
     const { name, value } = e.target;
-  
-    // Guardamos la fecha tal cual viene del input
     setFormData({ ...formData, [name]: value });
   };
-    // Función para formatear fechas en el formato 'dd/mm/yyyy'
-const formatDateToDDMMYYYY = (date: string | Date): string => {
-  const d = new Date(date);
-  const day = String(d.getDate()).padStart(2, '0');
-  const month = String(d.getMonth() + 1).padStart(2, '0'); // Los meses son 0-indexados
-  const year = d.getFullYear();
-  return `${day}/${month}/${year}`;
-};
-
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-  
+
     if (!formData.responsable || !clienteId || !proyectoId) {
       console.error("Responsable, cliente o proyecto no definidos.");
       return;
     }
 
+    // Busca el objeto completo del responsable
+    const selectedResponsable = filteredPersonal.find(
+      (personal) => personal._id === formData.responsable
+    );
+
+    if (!selectedResponsable) {
+      console.error("No se encontró el responsable seleccionado.");
+      return;
+    }
+
     const dataToSend = {
       ...formData,
+      responsable: formData.responsable, // Enviar solo el ID al backend
       cliente: clienteId,
       proyecto: proyectoId,
-      fechacreacion: formData.fechacreacion ? formatDateToDDMMYYYY(formData.fechacreacion) : "",
-    fechacompromiso: formData.fechacompromiso ? formatDateToDDMMYYYY(formData.fechacompromiso) : "",
-    nuevafecha: formData.nuevafecha ? formatDateToDDMMYYYY(formData.nuevafecha) : "",
     };
-  
+
     console.log("Datos a enviar:", dataToSend);
-  
+
     try {
       const response = await API.post("/restricciones/", dataToSend);
       console.log("Datos enviados correctamente:", response.data);
-  
+
       if (response.status === 201 || response.status === 200) {
-        setRestricciones((prev) => [...prev, response.data.data]);
+        // Incluye el objeto completo del responsable en el contexto
+        const newRestriccion = {
+          ...response.data.data,
+          responsable: selectedResponsable, // Asocia el objeto completo
+        };
+
+        setRestricciones((prev) => [...prev, newRestriccion]);
+
         setFormData({
           responsable: "",
           compromiso: "",
@@ -102,12 +105,21 @@ const formatDateToDDMMYYYY = (date: string | Date): string => {
           createdAt: "",
           updatedAt: "",
         });
+
+        handleGuardarCambios();
       }
     } catch (error) {
       console.error("Error al enviar los datos:", error);
     }
   };
-  
+
+
+  const handleGuardarCambios = () => {
+    if (proyectoId) {
+      getRestriccionesByProyecto(proyectoId, clienteId);
+    }
+  };
+
   return (
     <div>
       <h1 className="text-3xl font-bold mb-4">
@@ -122,7 +134,7 @@ const formatDateToDDMMYYYY = (date: string | Date): string => {
           <label className="text-xs font-semibold">Responsable</label>
           <select
             name="responsable"
-            value={formData.responsable || ""}
+            value={typeof formData.responsable === 'string' ? formData.responsable : formData.responsable?._id || ""}
             onChange={handleChange}
             className="border border-gray-300 rounded-md p-1 text-sm"
           >
@@ -133,6 +145,7 @@ const formatDateToDDMMYYYY = (date: string | Date): string => {
               </option>
             ))}
           </select>
+
         </div>
 
         {[
@@ -163,6 +176,13 @@ const formatDateToDDMMYYYY = (date: string | Date): string => {
           Enviar
         </button>
       </form>
+
+      {/* <button
+        onClick={handleGuardarCambios}
+        className="mt-4 bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
+      >
+        Guardar Cambios
+      </button> */}
     </div>
   );
 };

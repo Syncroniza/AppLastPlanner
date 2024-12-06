@@ -1,4 +1,4 @@
-import React, { createContext, useState, useContext, ReactNode, useEffect } from 'react';
+import React, { createContext, useState, useContext, ReactNode, useEffect,useCallback } from 'react';
 import { Personal } from '../types/Personal';
 import { RestriccionesForm } from '../types/Restricciones';
 import { Cliente } from '../types/Cliente';
@@ -19,10 +19,12 @@ interface AppContextProps {
   setEquipoData: React.Dispatch<React.SetStateAction<Personal[]>>;
   restricciones: RestriccionesForm[];
   setRestricciones: React.Dispatch<React.SetStateAction<RestriccionesForm[]>>;
-  fetchRestricciones: () => Promise<void>;
+  fetchRestricciones: (proyectoId?: string, clienteId?: string) => Promise<void>;
+  fetchProyectos: () => Promise<void>;
+  fetchClientes: () => Promise<void>;
   getRestriccionesByProyecto: (proyectoId: string, clienteId?: string) => RestriccionesForm[];
   logout: () => void;
-  
+  updateRestriccionInContext: (updatedRestriccion: RestriccionesForm) => void;
 }
 
 
@@ -30,31 +32,41 @@ const AppContext = createContext<AppContextProps | undefined>(undefined);
 
 export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
   const [clienteId, setClienteId] = useState<string | null>(null);
-  console.log("contextclienteID",clienteId)
   const [proyectoId, setProyectoId] = useState<string | null>(null);
-  console.log("contextProyectID",proyectoId)
   const [clientes, setClientes] = useState<Cliente[]>([]);
   const [proyectos, setProyectos] = useState<Proyecto[]>([]);
-  console.log("proyectoscontext",proyectos)
   const [equipoData, setEquipoData] = useState<Personal[]>([]);
-  console.log("equipoData",equipoData)
   const [restricciones, setRestricciones] = useState<RestriccionesForm[]>([]);
-  console.log("restricciones",restricciones)
 
   // Inicializar navigate para redireccionar
   const navigate = useNavigate();
-  
 
-  // Función para obtener restricciones desde el backend
-  const fetchRestricciones = async () => {
+  const updateRestriccionInContext = (updatedRestriccion: RestriccionesForm) => {
+    setRestricciones((prev) =>
+      prev.map((restriccion) => restriccion._id === updatedRestriccion._id ? updatedRestriccion : restriccion)
+    );
+  };
+
+
+  const fetchRestricciones = async (proyectoId?: string, clienteId?: string) => {
     try {
-      const response = await API.get('/restricciones/');
+      let endpoint = '/restricciones';
+      if (proyectoId || clienteId) {
+        const queryParams = new URLSearchParams();
+        if (proyectoId) queryParams.append('proyectoId', proyectoId);
+        if (clienteId) queryParams.append('clienteId', clienteId);
+        endpoint += `?${queryParams.toString()}`;
+      }
+      const response = await API.get(endpoint);
       console.log('Restricciones cargadas:', response.data.data);
-      setRestricciones(response.data.data);
+      setRestricciones(response.data.data); // Actualiza el estado
     } catch (error) {
-      console.error('Error al cargar las restricciones:', error);
+      console.error('Error al cargar restricciones:', error);
     }
   };
+  
+  
+
 
   // Función para cerrar sesión
   const logout = () => {
@@ -76,60 +88,60 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
         restriccion.proyecto &&
         ((typeof restriccion.proyecto === 'string' && restriccion.proyecto.trim() === proyectoId.trim()) ||
           (typeof restriccion.proyecto === 'object' && restriccion.proyecto._id?.toString().trim() === proyectoId.trim()));
-  
+
       // Verificar si `cliente` es un string o un objeto, y asegurarse de que no sea `null`
       const matchCliente = clienteId
         ? restriccion.cliente &&
-          ((typeof restriccion.cliente === 'string' && restriccion.cliente.trim() === clienteId.trim()) ||
-            (typeof restriccion.cliente === 'object' && restriccion.cliente._id?.toString().trim() === clienteId.trim()))
+        ((typeof restriccion.cliente === 'string' && restriccion.cliente.trim() === clienteId.trim()) ||
+          (typeof restriccion.cliente === 'object' && restriccion.cliente._id?.toString().trim() === clienteId.trim()))
         : true;
-  
+
       console.log("Comparando restricción:", restriccion);
       console.log("matchProyecto:", matchProyecto, "matchCliente:", matchCliente);
-  
+
       return matchProyecto && matchCliente;
     });
   };
-  
-  
-  
-  
+
+
+  const fetchClientes = useCallback(async () => {
+    try {
+      const response = await API.get('/clientes/');
+      console.log('Clientes obtenidos:', response.data.data);
+      setClientes(response.data.data);
+    } catch (error) {
+      console.error('Error al obtener los clientes:', error);
+    }
+  }, []); // Sin dependencias, para que no cambie de referencia
+
+  const fetchProyectos = useCallback(async () => {
+    try {
+      const response = await API.get('/proyectos/');
+      console.log('Proyectos obtenidos:', response.data.data);
+      setProyectos(response.data.data);
+    } catch (error) {
+      console.error('Error al obtener los proyectos:', error);
+    }
+  }, []); // Sin dependencias
+
+  const fetchEquipo = useCallback(async () => {
+    try {
+      const response = await API.get('/equipo/');
+      console.log('Equipo obtenido:', response.data.data);
+      setEquipoData(response.data.data);
+    } catch (error) {
+      console.error('Error al obtener el equipo:', error);
+    }
+  }, []); // Sin dependencias
+
 
   useEffect(() => {
-    const fetchClientes = async () => {
-      try {
-        const response = await API.get('/clientes/');
-        console.log('Clientes obtenidos:', response.data.data);
-        setClientes(response.data.data);
-      } catch (error) {
-        console.error('Error al obtener los clientes:', error);
-      }
-    };
-
-    const fetchProyectos = async () => {
-      try {
-        const response = await API.get('/proyectos/');
-        console.log("resoonseprojectos",response)
-        setProyectos(response.data.data);
-      } catch (error) {
-        console.error('Error al obtener los proyectos:', error);
-      }
-    };
-
-    const fetchEquipo = async () => {
-      try {
-        const response = await API.get('/equipo/');
-        setEquipoData(response.data.data);
-      } catch (error) {
-        console.error('Error al obtener los datos del equipo:', error);
-      }
-    };
-
     fetchClientes();
     fetchProyectos();
     fetchEquipo();
     fetchRestricciones(); // Cargar restricciones
   }, []);
+
 
   return (
     <AppContext.Provider
@@ -144,11 +156,16 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
         setRestricciones,
         fetchRestricciones,
         getRestriccionesByProyecto,
+        updateRestriccionInContext,
+        fetchProyectos,
+        fetchClientes,
         clienteId,
         setClienteId,
         proyectoId,
         setProyectoId,
         logout,
+
+
       }}
     >
       {children}
