@@ -5,7 +5,7 @@ import { Proyecto } from '../types/Proyecto';
 import { useNavigate } from 'react-router-dom';
 
 const ClienteProyectoList: React.FC = () => {
-  const { clientes, setClienteId, setProyectoId, getRestriccionesByProyecto, fetchProyectos,fetchClientes } = useAppContext();
+  const { clientes, setClienteId, setProyectoId, getRestriccionesByProyecto, fetchProyectos,fetchClientes,fetchEquipo } = useAppContext();
   const navigate = useNavigate();
   const [proyectosVisibles, setProyectosVisibles] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -81,10 +81,11 @@ const ClienteProyectoList: React.FC = () => {
       setLoading(false);
     }
   };
+
+  useEffect(() => {
+    fetchEquipo(); // Llamada inicial para cargar el equipo al montar el componente
+  }, [fetchEquipo]);
   
-
-
-
   const handleCrearPersonal = (proyectoId?: string) => {
     if (!proyectoId) return;
     navigate(`/proyectos/${proyectoId}/personal`);

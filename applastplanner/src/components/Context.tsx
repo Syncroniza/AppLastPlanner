@@ -22,6 +22,7 @@ interface AppContextProps {
   fetchRestricciones: (proyectoId?: string, clienteId?: string) => Promise<void>;
   fetchProyectos: () => Promise<void>;
   fetchClientes: () => Promise<void>;
+  fetchEquipo: () => Promise<void>;
   getRestriccionesByProyecto: (proyectoId: string, clienteId?: string) => RestriccionesForm[];
   logout: () => void;
   updateRestriccionInContext: (updatedRestriccion: RestriccionesForm) => void;
@@ -164,8 +165,7 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
         proyectoId,
         setProyectoId,
         logout,
-
-
+        fetchEquipo
       }}
     >
       {children}

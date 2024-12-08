@@ -16,9 +16,17 @@ const formatDate = (dateString: string) => {
 };
 
 const PageWithPDF: React.FC = () => {
-  const { clienteId, proyectoId, getRestriccionesByProyecto } = useAppContext();
+  const { clienteId, proyectoId, getRestriccionesByProyecto,proyectos } = useAppContext();
+  console.log("clienteId", clienteId)
   const [restriccionesFiltradas, setRestriccionesFiltradas] = useState<RestriccionesForm[]>([]);
+  const fechaGeneracion = formatDate(new Date().toISOString());
 
+
+  // Obtener el nombre del proyecto basado en `proyectoId`
+  const nombreProyecto = React.useMemo(() => {
+    const proyecto = proyectos.find((p) => p._id === proyectoId);
+    return proyecto ? proyecto.nombre : 'Proyecto desconocido';
+  }, [proyectoId, proyectos]);
   useEffect(() => {
     if (proyectoId) {
       const todasLasRestricciones = getRestriccionesByProyecto(proyectoId, clienteId || undefined);
@@ -26,6 +34,7 @@ const PageWithPDF: React.FC = () => {
         (restriccion: RestriccionesForm) => restriccion.status === 'abierta'
       );
       setRestriccionesFiltradas(restriccionesAbiertas);
+
     }
   }, [proyectoId, clienteId, getRestriccionesByProyecto]);
 
@@ -59,8 +68,14 @@ const PageWithPDF: React.FC = () => {
         Descargar PDF
       </button>
 
-      <div id="pdf-content" className="w-full  p-4 bg-gray-200 shadow-md rounded-lg">
+      <div id="pdf-content" className="w-full  p-4 bg-white shadow-md rounded-lg">
         <h1 className="text-3xl font-bold text-center mb-6">Informe de Restricciones</h1>
+        <p className="text-center text-sm mb-6">
+          Proyecto: <strong>{nombreProyecto}</strong>
+        </p>
+        <p className="text-center text-sm mb-4">
+          Fecha de generación: <strong>{fechaGeneracion}</strong>
+        </p>
 
         {/* Contenedor de los gráficos centrados */}
         <div className="flex flex-col items-center mb-6 space-y-6">
