@@ -43,23 +43,31 @@ export function createEquipo(req, res) {
   console.log(data);
   EquipoModel
     .create(data)
-    .then((data) => {
-      res.json({ data: data });
+    .then((createdEquipo) => {
+      // Realizar populate de las referencias
+      return EquipoModel.findById(createdEquipo._id)
+        .populate('cliente') // Asegúrate de que el modelo `EquipoModel` tiene la referencia `cliente`
+        .populate('proyecto'); // Asegúrate de que el modelo `EquipoModel` tiene la referencia `proyecto`
+    })
+    .then((populatedEquipo) => {
+      res.json(populatedEquipo); // Devuelve el participante con cliente y proyecto completos
     })
     .catch((error) => {
-      // error de validacion de mongoose
-      if (error instanceof Error.ValidatorError) {
-        let keys = Object.keys(error.errors);
-        let error_dict = {};
-        keys.map((key) => {
-          error_dict[key] = error.errors[key].message;
-        });
-        res.status(500).json({ error: error_dict });
+      if (error.name === 'ValidationError') {
+        const error_dict = Object.keys(error.errors).reduce((acc, key) => {
+          acc[key] = error.errors[key].message;
+          return acc;
+        }, {});
+        res.status(400).json({ error: error_dict });
       } else {
-        res.status(500).json({ error: error });
+        res.status(500).json({ error: 'Error en el servidor', details: error });
       }
     });
 }
+
+
+
+
 export function deleteEquipo(req, res) {
   let id = req.params.id;
   if (!ObjectId.isValid(id))

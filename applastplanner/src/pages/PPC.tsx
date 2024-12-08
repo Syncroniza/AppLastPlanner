@@ -3,8 +3,8 @@ import html2canvas from 'html2canvas';
 import jsPDF from 'jspdf';
 import GraficoRestricciones from '../components/GraficoRestricciones';
 import ResumenRestriccionesPorResponsable from '../components/ResumenRestriccionesPorResponsable';
-import { useAppContext } from '../components/Context'; 
-import { RestriccionesForm } from '../types/Restricciones'; 
+import { useAppContext } from '../components/Context';
+import { RestriccionesForm } from '../types/Restricciones';
 
 const formatDate = (dateString: string) => {
   const date = new Date(dateString);
@@ -28,7 +28,7 @@ const PageWithPDF: React.FC = () => {
       setRestriccionesFiltradas(restriccionesAbiertas);
     }
   }, [proyectoId, clienteId, getRestriccionesByProyecto]);
-  
+
   const handleDownloadPDF = async () => {
     const input = document.getElementById('pdf-content');
     if (input) {
@@ -51,15 +51,15 @@ const PageWithPDF: React.FC = () => {
   };
 
   return (
-    <div className="flex flex-col items-center w-full p-4 bg-gray-200">
+    <div className="flex flex-col items-center w-full overflow-x-auto p-4 bg-gray-200">
       <button
         onClick={handleDownloadPDF}
-        className="mb-4 px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
+        className="mb-4 px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-500"
       >
         Descargar PDF
       </button>
 
-      <div id="pdf-content" className="w-full max-w-4xl p-4 bg-blue-200 shadow-md rounded-lg">
+      <div id="pdf-content" className="w-full  p-4 bg-gray-200 shadow-md rounded-lg">
         <h1 className="text-3xl font-bold text-center mb-6">Informe de Restricciones</h1>
 
         {/* Contenedor de los gráficos centrados */}
@@ -75,36 +75,39 @@ const PageWithPDF: React.FC = () => {
         <h2 className="text-2xl font-semibold mb-4 text-center">Listado de Restricciones</h2>
         {restriccionesFiltradas.length > 0 ? (
           <div className="overflow-x-auto w-full">
-            <table className="min-w-full border-collapse border border-gray-300">
-              <thead>
-                <tr className="bg-gray-200">
-                  <th className="border border-gray-300 px-4 py-2 text-left">Responsable</th>
-                  <th className="border border-gray-300 px-4 py-2 text-left">Restricción</th>
-                  <th className="border border-gray-300 px-4 py-2 text-left">Fecha de Creación</th>
-                  <th className="border border-gray-300 px-4 py-2 text-left">Fecha Compromiso</th>
-                  <th className="border border-gray-300 px-4 py-2 text-left">Status</th>
-                  <th className="border border-gray-300 px-4 py-2 text-left">CNC</th>
-                  <th className="border border-gray-300 px-4 py-2 text-left">Nueva Fecha</th>
+            <table className="min-w-full border-collapse border border-gray-300 divide-y divide-gray-300">
+              <thead className="bg-gray-200">
+                <tr>
+                  <th className="px-6 py-3 text-left text-sm font-medium text-gray-700">Responsable</th>
+                  <th className="px-6 py-3 text-left text-sm font-medium text-gray-700">Restricción</th>
+                  <th className="px-6 py-3 text-left text-sm font-medium text-gray-700">Fecha de Creación</th>
+                  <th className="px-6 py-3 text-left text-sm font-medium text-gray-700">Fecha Compromiso</th>
+                  <th className="px-6 py-3 text-left text-sm font-medium text-gray-700">Status</th>
+                  <th className="px-6 py-3 text-left text-sm font-medium text-gray-700">CNC</th>
+                  <th className="px-6 py-3 text-left text-sm font-medium text-gray-700">Nueva Fecha</th>
                 </tr>
               </thead>
-              <tbody>
+              <tbody className="divide-y divide-gray-300">
                 {restriccionesFiltradas.map((restriccion: RestriccionesForm) => (
-                  <tr key={restriccion._id}>
-                    <td className="border border-gray-300 px-4 py-2">
-                      {restriccion.responsable
+                  <tr
+                    key={restriccion._id}
+                    className="odd:bg-gray-100 even:bg-white hover:bg-gray-200"
+                  >
+                    <td className="px-6 py-3">
+                      {typeof restriccion.responsable === 'object' && restriccion.responsable !== null
                         ? `${restriccion.responsable.nombre} ${restriccion.responsable.apellido}`
                         : 'No asignado'}
                     </td>
-                    <td className="border border-gray-300 px-4 py-2">{restriccion.compromiso}</td>
-                    <td className="border border-gray-300 px-4 py-2">
+                    <td className="px-6 py-3">{restriccion.compromiso}</td>
+                    <td className="px-6 py-3">
                       {formatDate(restriccion.fechacreacion)}
                     </td>
-                    <td className="border border-gray-300 px-4 py-2">
+                    <td className="px-6 py-3">
                       {formatDate(restriccion.fechacompromiso)}
                     </td>
-                    <td className="border border-gray-300 px-4 py-2">{restriccion.status}</td>
-                    <td className="border border-gray-300 px-4 py-2">{restriccion.cnc}</td>
-                    <td className="border border-gray-300 px-4 py-2">
+                    <td className="px-6 py-3">{restriccion.status}</td>
+                    <td className="px-6 py-3">{restriccion.cnc}</td>
+                    <td className="px-6 py-3">
                       {restriccion.nuevafecha ? formatDate(restriccion.nuevafecha) : 'N/A'}
                     </td>
                   </tr>

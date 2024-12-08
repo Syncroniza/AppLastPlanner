@@ -12,6 +12,7 @@ import Login from './pages/Login';
 import Register from './pages/Register';
 import ProtectedRoute from './services/ProtectedRoute';
 import { AppProvider } from './components/Context';
+import "react-toastify/dist/ReactToastify.css";
 
 const App: React.FC = () => {
   return (

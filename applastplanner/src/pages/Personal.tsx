@@ -5,9 +5,11 @@ import API from "../api"; // Importa el cliente Axios configurado
 
 const PersonalTable: React.FC = () => {
   const { equipoData, setEquipoData } = useAppContext();
+  console.log("equipoData",equipoData)
 
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
+  
 
   useEffect(() => {
     const fetchData = async () => {
@@ -55,7 +57,7 @@ const PersonalTable: React.FC = () => {
             </thead>
             <tbody className="divide-y divide-gray-200">
               {equipoData.map((personal, index) => (
-                <tr key={personal.id || index} className="hover:bg-gray-50">
+                <tr key={personal._id || index} className="hover:bg-gray-50">
                   <td className="px-4 py-2 text-center text-sm border-r border-gray-300 whitespace-nowrap">
                     {index + 1}
                   </td>

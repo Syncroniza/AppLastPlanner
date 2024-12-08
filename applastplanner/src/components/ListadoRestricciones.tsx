@@ -13,7 +13,7 @@ const ListadoRestricciones: React.FC = () => {
   const location = useLocation();
   const { clienteId, proyectoId } = location.state || {}; // Extrae clienteId y proyectoId del estado
   const [filteredRestricciones, setFilteredRestricciones] = useState<RestriccionesForm[]>([]);
-  console.log("filteredRestricciones",filteredRestricciones)
+  console.log("filteredRestricciones", filteredRestricciones)
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedRestriccion, setSelectedRestriccion] = useState<RestriccionesForm | null>(null);
   const [sortConfig, setSortConfig] = useState<{ key: string; direction: 'asc' | 'desc' } | null>(null);
@@ -143,12 +143,7 @@ const ListadoRestricciones: React.FC = () => {
       >
         Exportar a Excel
       </button>
-      {/* <button
-        onClick={fetchRestricciones}
-        className="mb-4 ml-4 bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
-      >
-        Guardar Cambios
-      </button> */}
+
       {updateMessage && (
         <div className="mb-4 p-2 text-white bg-green-500 rounded flex items-center">
           {updateMessage}
@@ -159,12 +154,7 @@ const ListadoRestricciones: React.FC = () => {
           )}
         </div>
       )}
-      <button
-        onClick={fetchRestricciones}
-        className="mb-4 ml-6 bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
-      >
-        Cargar Restricciones
-      </button>
+
 
       <table className="min-w-full bg-white border border-gray-200">
         <thead>

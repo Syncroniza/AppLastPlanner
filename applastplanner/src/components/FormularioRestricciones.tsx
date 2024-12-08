@@ -38,6 +38,8 @@ const FormularioRestricciones: React.FC = () => {
         (equipo) =>
           equipo.cliente?._id === clienteId && equipo.proyecto?._id === proyectoId
       );
+
+      
       setFilteredPersonal(filtered);
     }
   }, [equipoData, clienteId, proyectoId]);
@@ -176,13 +178,6 @@ const FormularioRestricciones: React.FC = () => {
           Enviar
         </button>
       </form>
-
-      {/* <button
-        onClick={handleGuardarCambios}
-        className="mt-4 bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
-      >
-        Guardar Cambios
-      </button> */}
     </div>
   );
 };
