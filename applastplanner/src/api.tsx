@@ -1,8 +1,9 @@
 // src/api.ts
 import axios from 'axios';
+import {BASE_URL} from "./constants.ts";
 
 const API = axios.create({
-  baseURL: 'http://localhost:8000', // URL base del backend
+  baseURL: BASE_URL, // URL base del backend
 });
 
 // Interceptor para agregar el token al encabezado Authorization

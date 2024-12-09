@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { Navigate } from 'react-router-dom';
 import { getToken } from './authService';
+import {BASE_URL} from "../constants.ts";
 
 interface ProtectedRouteProps {
   children: React.ReactNode;
@@ -19,7 +20,7 @@ const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children }) => {
 
       try {
         // Valida el token si necesitas verificarlo en el backend
-        const response = await fetch('http://localhost:8000/auth/verify', {
+        const response = await fetch(`${BASE_URL}/auth/verify`, {
           method: 'GET',
           headers: {
             Authorization: `Bearer ${token}`,

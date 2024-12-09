@@ -78,9 +78,9 @@ const ListadoRestricciones: React.FC = () => {
     setIsModalOpen(true);
   };
 
-  const handleModalClose = () => {
-    setIsModalOpen(false);
-  };
+  // const handleModalClose = () => {
+  //   setIsModalOpen(false);
+  // };
 
 
   const handleCheckboxChange = async (restriccion: RestriccionesForm) => {
