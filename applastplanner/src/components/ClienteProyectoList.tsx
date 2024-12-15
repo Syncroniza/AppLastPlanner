@@ -11,8 +11,6 @@ const ClienteProyectoList: React.FC = () => {
   const [loading, setLoading] = useState(false);
 
 
-
-  
   useEffect(() => {
     const cargarRestriccionesIniciales = async () => {
       try {
@@ -137,14 +135,7 @@ const ClienteProyectoList: React.FC = () => {
   return (
     <div className="p-4 bg-slate-100 shadow-md rounded-md w-full ">
       <h2 className="text-2xl font-bold mb-4">Listado de Clientes y Proyectos</h2>
-      {/* Botón para cargar proyectos */}
-      {/* <button
-      onClick={handleVerProyectos}
-      className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
-    >
-      {loading ? 'Cargando...' : 'VER PROYECTOS'}
-    </button> */}
-
+    
       <div className="">
         {proyectosVisibles && clientes.length > 0 ? (
           clientes.map((cliente) => ( // Sin llaves adicionales aquí

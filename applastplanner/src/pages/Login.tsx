@@ -12,7 +12,7 @@ const Login: React.FC = () => {
     e.preventDefault();
     try {
       await login({ email, password });
-      navigate('/home'); // Redirige al usuario a la página principal
+      navigate('/seleccionar-proyecto'); // Redirige al usuario a la página principal
     } catch (err) {
       setError('Credenciales incorrectas');
     }

@@ -7,6 +7,8 @@ import restriccioesRoutes from "./routes/restricciones.routes.js";
 import clienteRoutes from "./routes/clientes.routes.js";
 import proyectoRoutes from "./routes/proyecto.routes.js";
 import authRoutes from "./routes/auth.routes.js";
+import hormigonRoutes from"../server/routes/hormigones.routes.js";
+import curvaHormigonRoutes from "./routes/curvahormigon.routes.js";
 import user from "./models/user.js";
 import bcrypt from "bcryptjs"; 
 
@@ -20,7 +22,7 @@ const whitelist = [
   "http://localhost:5174",
   "http://localhost:5175",
   "https://planner.appsyncroniza.cl",
-    "https://dxbz1umzn4kb5.cloudfront.net"
+  "https://dxbz1umzn4kb5.cloudfront.net"
 ];
 
 app.use(
@@ -73,6 +75,9 @@ equipoRoutes(app);
 restriccioesRoutes(app);
 clienteRoutes(app);
 proyectoRoutes(app);
+hormigonRoutes(app)
+curvaHormigonRoutes(app)
+
 
 app.use("/auth", authRoutes); // Rutas para autenticación
 console.log("Rutas de autenticación configuradas en /auth");

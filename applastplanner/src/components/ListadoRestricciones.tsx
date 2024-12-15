@@ -13,7 +13,6 @@ const ListadoRestricciones: React.FC = () => {
   const location = useLocation();
   const { clienteId, proyectoId } = location.state || {}; // Extrae clienteId y proyectoId del estado
   const [filteredRestricciones, setFilteredRestricciones] = useState<RestriccionesForm[]>([]);
-  console.log("filteredRestricciones", filteredRestricciones)
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedRestriccion, setSelectedRestriccion] = useState<RestriccionesForm | null>(null);
   const [sortConfig, setSortConfig] = useState<{ key: string; direction: 'asc' | 'desc' } | null>(null);

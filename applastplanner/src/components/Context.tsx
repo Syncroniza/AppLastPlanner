@@ -66,7 +66,6 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
     }
   };
   
-  
 
 
   // Función para cerrar sesión
