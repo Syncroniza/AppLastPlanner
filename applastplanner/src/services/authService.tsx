@@ -1,6 +1,7 @@
 import axios from 'axios';
+import {BASE_URL} from "../constants.ts";
 
-const API_URL = 'http://localhost:8000'; // Define la URL base para reutilización
+const API_URL = BASE_URL; // Define la URL base para reutilización
 
 export interface LoginData {
   email: string;

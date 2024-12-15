@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from 'react';
-import axios from 'axios';
 import { useAppContext } from './Context';
 import { RestriccionesForm } from '../types/Restricciones';
 import API from '../api';
@@ -72,12 +71,12 @@ const Modal: React.FC<ModalProps> = ({ isOpen, onClose, restriccion, onUpdate })
             <label className="text-sm font-medium">Responsable</label>
             <select
               name="responsable"
-              value={formData.responsable}
+              value={formData.responsable as string}
               onChange={handleChange}
               className="w-full border border-gray-300 rounded p-2"
             >
               <option value="">Seleccione un responsable</option>
-              {equipoData.map((equipo) => (
+              {equipoData.map((equipo: any) => (
                 <option key={equipo.id} value={`${equipo.nombre} ${equipo.apellido}`}>
                   {equipo.nombre} {equipo.apellido}
                 </option>
