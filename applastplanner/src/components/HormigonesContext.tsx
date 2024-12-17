@@ -2,6 +2,9 @@
 
 import React, { createContext, useContext, useState, ReactNode, useCallback } from "react";
 import API from "../api";
+// import { HormigonData } from "../types/HormigonData";
+// import { CurvaHormigonData } from "../types/Curvahormigondata";
+// import { ComparacionHormigones } from "../types/ComparacionHormigones";
 
 // Interfaces definidas anteriormente
 export interface HormigonData {
@@ -26,6 +29,13 @@ export interface CurvaHormigonData {
     createdAt?: string;
     updatedAt?: string;
 }
+
+export interface ComparacionHormigones {
+    semana: string;
+    Hg_Planificado: number;
+    Hg_Real: number;
+    inicioSemana: string;
+  }
 
 interface HormigonesContextProps {
     // Para Hormigones
@@ -55,7 +65,7 @@ const HormigonesContext = createContext<HormigonesContextProps | undefined>(unde
 export const HormigonesProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
     // Estado para Hormigones
     const [hormigones, setHormigones] = useState<HormigonData[]>([]);
-    console.log("hormigones",hormigones)
+    console.log("hormigones",)
 
     // Funciones para Hormigones
     const fetchHormigones = useCallback(
@@ -63,7 +73,7 @@ export const HormigonesProvider: React.FC<{ children: ReactNode }> = ({ children
             clienteId?: string | null,
             proyectoId?: string | null,
             page = 1,
-            limit = 10
+            limit = 100
         ) => {
             const queryParams = new URLSearchParams();
             if (clienteId) queryParams.append("clienteId", clienteId);
@@ -73,7 +83,7 @@ export const HormigonesProvider: React.FC<{ children: ReactNode }> = ({ children
 
             const endpoint = `/hormigones?${queryParams.toString()}`;
             const response = await API.get(endpoint);
-            console.log("response",response)
+            console.log("response", response)
 
             const { data, currentPage, totalPages } = response.data;
 
@@ -94,7 +104,7 @@ export const HormigonesProvider: React.FC<{ children: ReactNode }> = ({ children
 
     // Estado para CurvaHormigon
     const [curvaHormigones, setCurvaHormigones] = useState<CurvaHormigonData[]>([]);
-    console.log("curvaHormigones",curvaHormigones)
+    console.log("curvaHormigones", curvaHormigones)
 
     // Función para fetch CurvaHormigon
     const fetchCurvaHormigones = useCallback(
@@ -104,21 +114,21 @@ export const HormigonesProvider: React.FC<{ children: ReactNode }> = ({ children
                 setCurvaHormigones([]); // Actualiza el estado con un arreglo vacío
                 return { data: [] };
             }
-    
+
             const queryParams = new URLSearchParams();
             queryParams.append("clienteId", clienteId);
             queryParams.append("proyectoId", proyectoId);
-    
+
             const endpoint = `/curvahormigon?${queryParams.toString()}`;
             console.log("Endpoint generado:", endpoint);
-    
+
             try {
                 const response = await API.get<CurvaHormigonData[]>(endpoint);
                 console.log("response curvahormigon", response.data);
-    
+
                 // Aquí pasamos directamente el arreglo al estado
                 setCurvaHormigones(response.data);
-    
+
                 return { data: response.data };
             } catch (error) {
                 console.error("Error al obtener curvas de hormigón:", error);

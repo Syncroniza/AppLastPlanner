@@ -53,20 +53,19 @@ const TablaHormigones: React.FC = () => {
         <p>Cargando...</p>
       ) : (
         <>
-          <h2 className="mb-4 text-xl font-bold text-center">Lista de Hormigones</h2>
+          <h2 className="mb-4 text-xs font-bold text-center">Lista de Hormigones</h2>
           <div className="overflow-x-auto">
-            <table className="w-full table-auto border-collapse border border-gray-300">
+            <table className="w-full table-auto border-collapse border border-gray-300 text-xs">
               <thead>
                 <tr className="bg-gray-200">
-                  <th className="border border-gray-300 p-2">N° GUÍA</th>
-                  <th className="border border-gray-300 p-2">EMPRESA</th>
-                  <th className="border border-gray-300 p-2">FECHA</th>
-                  <th className="border border-gray-300 p-2">PISO</th>
-                  <th className="border border-gray-300 p-2">UBICACIÓN</th>
-                  <th className="border border-gray-300 p-2">ELEMENTO</th>
-                  <th className="border border-gray-300 p-2">CANTIDAD</th>
-                  <th className="border border-gray-300 p-2">MUESTRAS</th>
-                  <th className="border border-gray-300 p-2">TIPO</th>
+                  <th className="border border-gray-300 p-2 text-sm">N° GUÍA</th>
+                  <th className="border border-gray-300 p-2 text-sm ">FECHA</th>
+                  <th className="border border-gray-300 p-2 text-sm">PISO</th>
+                  <th className="border border-gray-300 p-2 text-sm">UBICACIÓN</th>
+                  <th className="border border-gray-300 p-2 text-sm">ELEMENTO</th>
+                  <th className="border border-gray-300 p-2 text-sm">CANTIDAD</th>
+                  <th className="border border-gray-300 p-2 text-sm">MUESTRAS</th>
+                  <th className="border border-gray-300 p-2 text-sm">TIPO</th>
                 </tr>
               </thead>
               <tbody>
@@ -75,15 +74,15 @@ const TablaHormigones: React.FC = () => {
 
                   return (
                     <tr key={index} className="text-center odd:bg-white even:bg-gray-100">
-                      <td className="border border-gray-300 p-2">{hormigon.guia}</td>
-                      <td className="border border-gray-300 p-2">{hormigon.empresaProveedoresHG}</td>
-                      <td className="border border-gray-300 p-2">{fechaFormateada}</td>
-                      <td className="border border-gray-300 p-2">{hormigon.piso}</td>
-                      <td className="border border-gray-300 p-2">{hormigon.ubicacion}</td>
-                      <td className="border border-gray-300 p-2">{hormigon.elemento}</td>
-                      <td className="border border-gray-300 p-2">{hormigon.cantidad}</td>
-                      <td className="border border-gray-300 p-2">{hormigon.muestras}</td>
-                      <td className="border border-gray-300 p-2">{hormigon.tipo}</td>
+                      <td className="border border-gray-300 p-2 text-xs">{hormigon.guia}</td>
+                      <td className="border border-gray-300 p-2 text-xs">{hormigon.empresaProveedoresHG}</td>
+                      <td className="border border-gray-300 p-2 text-xs">{fechaFormateada}</td>
+                      <td className="border border-gray-300 p-2 text-xs">{hormigon.piso}</td>
+                      <td className="border border-gray-300 p-2 text-xs">{hormigon.ubicacion}</td>
+                      <td className="border border-gray-300 p-2 text-xs">{hormigon.elemento}</td>
+                      <td className="border border-gray-300 p-2 text-xs">{hormigon.cantidad}</td>
+                      <td className="border border-gray-300 p-2 text-xs">{hormigon.muestras}</td>
+                      <td className="border border-gray-300 p-2 text-xs">{hormigon.tipo}</td>
                     </tr>
                   );
                 })}

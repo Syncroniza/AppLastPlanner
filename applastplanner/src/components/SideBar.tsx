@@ -4,7 +4,7 @@ import { useAppContext } from "../components/Context";
 import { HiOutlineTrendingUp, HiOutlineClipboardCheck } from 'react-icons/hi';
 
 const Sidebar: React.FC = () => {
-  const { logout, setClienteId, setProyectoId, fetchRestricciones, clienteId, proyectoId } = useAppContext();
+  const { logout, setClienteId, setProyectoId, fetchRestricciones, proyectoId } = useAppContext();
   const navigate = useNavigate();
   const [isOpen, setIsOpen] = useState(false);
 
@@ -44,7 +44,7 @@ const Sidebar: React.FC = () => {
           <ul>
             {/* HOME */}
             <li className="mb-2">
-              <Link to="/home" className="flex items-center p-2 hover:bg-gray-700 rounded">
+              <Link to="/home" className="flex items-center p-2 hover:bg-gray-700 rounded text-l">
                 Home
               </Link>
             </li>
@@ -55,7 +55,7 @@ const Sidebar: React.FC = () => {
                 onClick={() => setIsAvanceOpen(!isAvanceOpen)}
                 className="flex items-center p-2 hover:bg-gray-700 rounded w-full text-left"
               >
-                <HiOutlineTrendingUp className="mr-2" /> AVANCE
+                <HiOutlineTrendingUp className="mr-2 text-2xl" /> AVANCE
               </button>
               {isAvanceOpen && (
                 <ul className="ml-4">
@@ -66,7 +66,7 @@ const Sidebar: React.FC = () => {
                         setIsObraGruesaOpen(!isObraGruesaOpen);
                         setIsTerminacionesOpen(false);
                       }}
-                      className="block p-2 hover:bg-gray-700 rounded w-full text-left"
+                      className="block p-2 hover:bg-gray-700 rounded w-full text-left text-xs"
                     >
                       OBRA GRUESA
                     </button>
@@ -75,7 +75,7 @@ const Sidebar: React.FC = () => {
                         <li className="mb-2">
                           <Link
                             to={proyectoId ? `/proyectos/${proyectoId}/obragruesa/hormigon` : '#'}
-                            className={`block p-2 hover:bg-gray-700 rounded ${
+                            className={`block p-2 hover:bg-gray-700 rounded text-xs${
                               !proyectoId ? 'opacity-50 cursor-not-allowed' : ''
                             }`}
                           >
@@ -85,7 +85,7 @@ const Sidebar: React.FC = () => {
                         <li className="mb-2">
                           <Link
                             to={proyectoId ? `/proyectos/${proyectoId}/obragruesa/curvahormigon` : '#'}
-                            className={`block p-2 hover:bg-gray-700 rounded ${
+                            className={`block p-2 hover:bg-gray-700 rounded text-xs${
                               !proyectoId ? 'opacity-50 cursor-not-allowed' : ''
                             }`}
                           >
@@ -95,7 +95,7 @@ const Sidebar: React.FC = () => {
                         <li className="mb-2">
                           <Link
                             to={proyectoId ? `/proyectos/${proyectoId}/obragruesa/registrohormigon` : '#'}
-                            className={`block p-2 hover:bg-gray-700 rounded ${
+                            className={`block p-2 hover:bg-gray-700 rounded text-xs${
                               !proyectoId ? 'opacity-50 cursor-not-allowed' : ''
                             }`}
                           >

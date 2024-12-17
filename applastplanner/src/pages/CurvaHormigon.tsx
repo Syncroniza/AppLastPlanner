@@ -1,15 +1,16 @@
 import React from 'react';
 import CurvaHormigonChart from '../components/CurvaHormigonChart';
 import CurvaHormigonList from '../components/CurvaHormigonList';
-import CreateCurvaHormigon from '../components/CreateCurvaHormigon';
 
 function CurvaHormigon() {
   return (
     <div style={containerStyle}>
       <div style={chartContainerStyle}>
-        <CreateCurvaHormigon />
-        <CurvaHormigonChart />
-        <CurvaHormigonList />
+       
+        <div>
+          <CurvaHormigonList />
+          <CurvaHormigonChart />
+        </div>
       </div>
     </div>
   );

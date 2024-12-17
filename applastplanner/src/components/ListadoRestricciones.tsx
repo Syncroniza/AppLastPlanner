@@ -135,7 +135,7 @@ const ListadoRestricciones: React.FC = () => {
   console.log("Contenido de sortedRestricciones:", sortedRestricciones);
   return (
     <div className="overflow-x-auto mt-4">
-      <h1 className="text-3xl font-bold mb-4">LISTADO DE RESTRICCIONES</h1>
+      <h1 className="text-xl font-bold mb-4">LISTADO DE RESTRICCIONES</h1>
       <button
         onClick={handleExportToExcel}
         className="mb-4 bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600"

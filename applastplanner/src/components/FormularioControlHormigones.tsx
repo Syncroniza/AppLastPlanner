@@ -67,12 +67,12 @@ const FormularioControlHormigones: React.FC = () => {
     };
 
     return (
-        <form 
-          onSubmit={handleSubmit} 
-          className="p-4 space-y-3 bg-gray-100 rounded-md shadow-md text-sm"
+        <form
+            onSubmit={handleSubmit}
+            className="p-4 space-y-3 bg-gray-100 rounded-md shadow-md text-sm"
         >
             <div className="grid grid-cols-2 gap-3">
-                <label className="flex flex-col">
+                <label className="flex flex-col text-xs">
                     N° GUÍA
                     <input
                         type="text"
@@ -82,13 +82,13 @@ const FormularioControlHormigones: React.FC = () => {
                         className="p-1 border rounded text-sm"
                     />
                 </label>
-                <label className="flex flex-col">
+                <label className="flex flex-col text-xs">
                     EMPRESA PROVEEDORA DE HORMIGÓN
                     <select
                         name="empresaProveedoresHG"
                         value={hormigonData.empresaProveedoresHG}
                         onChange={handleChange}
-                        className="p-1 border rounded text-sm"
+                        className="p-1 border rounded text-xs"
                     >
                         <option value="">Selecciona una empresa</option>
                         <option value="Santa Laura Hormigones">Santa Laura Hormigones</option>
@@ -96,23 +96,23 @@ const FormularioControlHormigones: React.FC = () => {
                         <option value="Redymix">Redymix</option>
                     </select>
                 </label>
-                <label className="flex flex-col">
+                <label className="flex flex-col text-xs">
                     FECHA
                     <input
                         type="date"
                         name="fecha"
                         value={hormigonData.fecha}
                         onChange={handleChange}
-                        className="p-1 border rounded text-sm"
+                        className="p-1 border rounded text-xs"
                     />
                 </label>
-                <label className="flex flex-col">
+                <label className="flex flex-col text-xs">
                     PISO
                     <select
                         name="piso"
                         value={hormigonData.piso}
                         onChange={handleChange}
-                        className="p-1 border rounded text-sm"
+                        className="p-1 border rounded text-xs"
                     >
                         <option value="">Selecciona un piso</option>
                         <option value="Pilas">Pilas</option>
@@ -122,7 +122,7 @@ const FormularioControlHormigones: React.FC = () => {
                         {/* Agrega las demás opciones */}
                     </select>
                 </label>
-                <label className="flex flex-col">
+                <label className="flex flex-col text-xs">
                     UBICACIÓN (EJES)
                     <input
                         type="text"
@@ -132,13 +132,13 @@ const FormularioControlHormigones: React.FC = () => {
                         className="p-1 border rounded text-sm"
                     />
                 </label>
-                <label className="flex flex-col">
+                <label className="flex flex-col text-xs">
                     ELEMENTO
                     <select
                         name="elemento"
                         value={hormigonData.elemento}
                         onChange={handleChange}
-                        className="p-1 border rounded text-sm"
+                        className="p-1 border rounded text-xs"
                     >
                         <option value="">Selecciona un elemento</option>
                         <option value="Pilas">Pilas</option>
@@ -151,30 +151,30 @@ const FormularioControlHormigones: React.FC = () => {
                         <option value="Losas">Losas</option>
                     </select>
                 </label>
-                <label className="flex flex-col">
+                <label className="flex flex-col text-xs">
                     CANTIDAD
                     <input
                         type="number"
                         name="cantidad"
                         value={String(hormigonData.cantidad)}
                         onChange={handleChange}
-                        className="p-1 border rounded text-sm"
+                        className="p-1 border rounded text-xs"
                     />
                 </label>
-                <label className="flex flex-col">
+                <label className="flex flex-col text-xs">
                     MUESTRAS
                     <select
                         name="muestras"
                         value={hormigonData.muestras}
                         onChange={handleChange}
-                        className="p-1 border rounded text-sm"
+                        className="p-1 border rounded text-xs"
                     >
                         <option value="">Selecciona una opción</option>
                         <option value="Sí">Sí</option>
                         <option value="No">No</option>
                     </select>
                 </label>
-                <label className="flex flex-col">
+                <label className="flex flex-col text-xs">
                     TIPO HORMIGON
                     <select
                         name="tipo"
@@ -187,12 +187,11 @@ const FormularioControlHormigones: React.FC = () => {
                         <option value="GR 20,0 (10) 20/10">GR 20,0 (10) 20/10</option>
                         <option value="GR 25,0 (10) 40/08">GR 25,0 (10) 40/08</option>
                         <option value="GR 25,0(10)20/08BR07">GR 25,0(10)20/08BR07</option>
-                        <option value="GB 30,00(10)20/10n">GB 30,00(10)20/10n</option>
-                        {/* Más opciones */}
+                        <option value="GB 30,00(10)20/10">GB 30,00(10)20/10</option>
                     </select>
                 </label>
             </div>
-            <button type="submit" className="px-3 py-1 text-white bg-blue-500 rounded text-sm hover:bg-blue-600">
+            <button type="submit" className="px-3 py-1 text-white bg-blue-500 rounded text-xs hover:bg-blue-600">
                 Guardar
             </button>
         </form>
