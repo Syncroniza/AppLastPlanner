@@ -56,9 +56,19 @@ const ListadoRestricciones: React.FC = () => {
         const dateA = new Date(a[sortConfig.key as keyof RestriccionesForm] as string);
         const dateB = new Date(b[sortConfig.key as keyof RestriccionesForm] as string);
         return sortConfig.direction === 'asc' ? dateA.getTime() - dateB.getTime() : dateB.getTime() - dateA.getTime();
+      } else if (sortConfig.key === 'responsable') {
+        const valueA =
+          typeof a.responsable === 'object' && a.responsable !== null
+            ? `${a.responsable.nombre || ''} ${a.responsable.apellido || ''}`.toLowerCase()
+            : (a.responsable || '').toString().toLowerCase();
+        const valueB =
+          typeof b.responsable === 'object' && b.responsable !== null
+            ? `${b.responsable.nombre || ''} ${b.responsable.apellido || ''}`.toLowerCase()
+            : (b.responsable || '').toString().toLowerCase();
+        return sortConfig.direction === 'asc' ? valueA.localeCompare(valueB) : valueB.localeCompare(valueA);
       } else {
-        const valueA = (a[sortConfig.key as keyof RestriccionesForm] as string).toLowerCase();
-        const valueB = (b[sortConfig.key as keyof RestriccionesForm] as string).toLowerCase();
+        const valueA = (a[sortConfig.key as keyof RestriccionesForm] || '').toString().toLowerCase();
+        const valueB = (b[sortConfig.key as keyof RestriccionesForm] || '').toString().toLowerCase();
         return sortConfig.direction === 'asc' ? valueA.localeCompare(valueB) : valueB.localeCompare(valueA);
       }
     });

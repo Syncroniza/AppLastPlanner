@@ -36,11 +36,12 @@ const App: React.FC = () => {
             path="/seleccionar-proyecto"
             element={
               <ProtectedRoute>
-                <SeleccionarProyecto />
+                <div className='bg-blue-500'>
+                  <SeleccionarProyecto />
+                </div>
               </ProtectedRoute>
             }
           />
-
           {/* Rutas protegidas */}
           <Route
             path="/home"
@@ -48,7 +49,7 @@ const App: React.FC = () => {
               <ProtectedRoute>
                 <div className="flex flex-col h-screen">
                   {/* Header en la parte superior derecha */}
-                  <div className="flex justify-end bg-gray-100">
+                  <div className="flex justify-end bg-gray-800">
                     <Header />
                   </div>
                   {/* Contenido principal con Sidebar */}
@@ -65,7 +66,7 @@ const App: React.FC = () => {
             element={
               <ProtectedRoute>
                 <div className="flex flex-col h-screen">
-                  <div className="flex justify-end bg-gray-100">
+                  <div className="flex justify-end bg-gray-800">
                     <Header />
                   </div>
                   <div className="flex flex-grow">
@@ -81,7 +82,7 @@ const App: React.FC = () => {
             element={
               <ProtectedRoute>
                 <div className="flex flex-col h-screen">
-                  <div className="flex justify-end bg-gray-100">
+                  <div className="flex justify-end bg-gray-800">
                     <Header />
                   </div>
                   <div className="flex flex-grow">
@@ -97,7 +98,7 @@ const App: React.FC = () => {
             element={
               <ProtectedRoute>
                 <div className="flex flex-col h-screen">
-                  <div className="flex justify-end bg-gray-100">
+                  <div className="flex justify-end bg-gray-800">
                     <Header />
                   </div>
                   <div className="flex flex-grow">
@@ -113,7 +114,7 @@ const App: React.FC = () => {
             element={
               <ProtectedRoute>
                 <div className="flex flex-col h-screen">
-                  <div className="flex justify-end bg-gray-100">
+                  <div className="flex justify-end bg-gray-800">
                     <Header />
                   </div>
                   <div className="flex flex-grow">
@@ -131,7 +132,7 @@ const App: React.FC = () => {
             element={
               <ProtectedRoute>
                 <div className="flex flex-col h-screen">
-                  <div className="flex justify-end bg-gray-100">
+                  <div className="flex justify-end bg-gray-800">
                     <Header />
                   </div>
                   <div className="flex flex-grow">
@@ -149,7 +150,7 @@ const App: React.FC = () => {
             element={
               <ProtectedRoute>
                 <div className="flex flex-col h-screen">
-                  <div className="flex justify-end bg-gray-100">
+                  <div className="flex justify-end bg-gray-800">
                     <Header />
                   </div>
                   <div className="flex flex-grow">
@@ -167,7 +168,7 @@ const App: React.FC = () => {
             element={
               <ProtectedRoute>
                 <div className="flex flex-col h-screen">
-                  <div className="flex justify-end bg-gray-100">
+                  <div className="flex justify-end bg-gray-800">
                     <Header />
                   </div>
                   <div className="flex flex-grow">
