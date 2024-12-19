@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useAppContext } from '../components/Context';
 import { useNavigate } from 'react-router-dom';
+import BackgroundVideo from '../components/BackgroundVideo';
 
 const SeleccionarProyecto: React.FC = () => {
     const { proyectos, setProyectoId, setClienteId, fetchProyectos } = useAppContext();
@@ -38,28 +39,31 @@ const SeleccionarProyecto: React.FC = () => {
     };
 
     return (
-        <div className="p-6 bg-white rounded shadow-md w-full max-w-sm mx-auto mt-20">
-            <h1 className="text-2xl font-bold mb-4">Seleccionar Proyecto</h1>
-            <div className="mb-4">
-                <select
-                    value={proyectoSeleccionado}
-                    onChange={handleChange}
-                    className="w-full p-2 border rounded"
+        <div>
+            <BackgroundVideo />
+            <div className="p-6 bg-white rounded shadow-md w-full max-w-sm mx-auto mt-20">
+                <h1 className="text-2xl font-bold mb-4">Seleccionar Proyecto</h1>
+                <div className="mb-4">
+                    <select
+                        value={proyectoSeleccionado}
+                        onChange={handleChange}
+                        className="w-full p-2 border rounded"
+                    >
+                        <option value="">-- Selecciona un proyecto --</option>
+                        {proyectos.map((proyecto) => (
+                            <option key={proyecto._id} value={proyecto._id}>
+                                {proyecto.nombre} ({proyecto.cliente.nombre})
+                            </option>
+                        ))}
+                    </select>
+                </div>
+                <button
+                    onClick={handleConfirmar}
+                    className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
                 >
-                    <option value="">-- Selecciona un proyecto --</option>
-                    {proyectos.map((proyecto) => (
-                        <option key={proyecto._id} value={proyecto._id}>
-                            {proyecto.nombre} ({proyecto.cliente.nombre})
-                        </option>
-                    ))}
-                </select>
+                    Confirmar
+                </button>
             </div>
-            <button
-                onClick={handleConfirmar}
-                className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
-            >
-                Confirmar
-            </button>
         </div>
     );
 };

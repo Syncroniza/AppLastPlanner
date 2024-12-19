@@ -36,9 +36,7 @@ const App: React.FC = () => {
             path="/seleccionar-proyecto"
             element={
               <ProtectedRoute>
-                <div className='bg-blue-500'>
-                  <SeleccionarProyecto />
-                </div>
+                <SeleccionarProyecto />
               </ProtectedRoute>
             }
           />
