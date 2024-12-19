@@ -65,15 +65,15 @@ const Modal: React.FC<ModalProps> = ({ isOpen, onClose, restriccion, onUpdate })
   return (
     <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
       <div className="bg-white p-6 rounded shadow-lg">
-        <h2 className="text-lg font-semibold mb-4">Editar Restricción</h2>
+        <h2 className="text-sm font-semibold mb-4">Editar Restricción</h2>
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
-            <label className="text-sm font-medium">Responsable</label>
+            <label className="text-xs font-medium">Responsable</label>
             <select
               name="responsable"
               value={formData.responsable as string}
               onChange={handleChange}
-              className="w-full border border-gray-300 rounded p-2"
+              className="w-full border border-gray-300 text-xs rounded p-2"
             >
               <option value="">Seleccione un responsable</option>
               {equipoData.map((equipo: any) => (
@@ -86,37 +86,37 @@ const Modal: React.FC<ModalProps> = ({ isOpen, onClose, restriccion, onUpdate })
 
           {['compromiso', 'centrocosto', 'cnc'].map((field) => (
             <div key={field}>
-              <label className="text-sm font-medium capitalize">{field}</label>
+              <label className="text-sm font-medium capitalize ">{field}</label>
               <input
                 type="text"
                 name={field}
                 value={(formData as any)[field]}
                 onChange={handleChange}
-                className="w-full border border-gray-300 rounded p-2"
+                className="w-full border border-gray-300 rounded p-2 text-xs"
               />
             </div>
           ))}
 
           {['fechacreacion', 'fechacompromiso', 'nuevafecha'].map((field) => (
             <div key={field}>
-              <label className="text-sm font-medium capitalize">{field}</label>
+              <label className="text-xs font-medium capitalize">{field}</label>
               <input
                 type="date"
                 name={field}
                 value={(formData as any)[field] || ''}
                 onChange={handleChange}
-                className="w-full border border-gray-300 rounded p-2"
+                className="w-full border border-gray-300 rounded p-2 text-xs"
               />
             </div>
           ))}
 
           <div>
-            <label className="text-sm font-medium">Status</label>
+            <label className="text-xs font-medium">Status</label>
             <select
               name="status"
               value={formData.status}
               onChange={handleChange}
-              className="w-full border border-gray-300 rounded p-2"
+              className="w-full border border-gray-300 rounded p-2 text-xs"
             >
               <option value="abierta">Abierta</option>
               <option value="cerrada">Cerrada</option>

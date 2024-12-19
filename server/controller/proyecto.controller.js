@@ -3,10 +3,34 @@ import { ClienteModel } from "../models/cliente.models.js";
 
 export async function getAllProyectos(req, res) {
   try {
-    const proyectos = await ProyectoModel.find().populate("cliente");
+    const usuarioId = req.user?.id;
+    const userRole = req.user?.role;
+    const proyectosAcceso = req.user?.access?.proyectos || [];
+
+    if (!usuarioId) {
+      return res.status(403).json({ error: "Usuario no autenticado" });
+    }
+
+    let proyectos;
+
+    if (userRole === "admin") {
+      // Si es administrador, obtener todos los proyectos
+      console.log("Usuario administrador, obteniendo todos los proyectos.");
+      proyectos = await ProyectoModel.find().populate("cliente");
+    } else {
+      // Si no es administrador, filtrar proyectos según access.proyectos
+      if (proyectosAcceso.length === 0) {
+        return res.status(200).json({ data: [] }); // Sin proyectos asignados
+      }
+
+      console.log("Usuario no administrador, obteniendo proyectos permitidos.");
+      proyectos = await ProyectoModel.find({ _id: { $in: proyectosAcceso } }).populate("cliente");
+    }
+
     res.status(200).json({ data: proyectos });
   } catch (error) {
-    res.status(500).json({ error: error.message });
+    console.error("Error al obtener los proyectos:", error.message);
+    res.status(500).json({ error: "Error al obtener los proyectos" });
   }
 }
 
@@ -22,10 +46,6 @@ export const getProyectoById = async (req, res) => {
     res.status(500).json({ error: "Error al obtener el proyecto" });
   }
 };
-
-
-
-
 
 export async function createProyecto(req, res) {
   try {

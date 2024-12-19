@@ -38,7 +38,6 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
   const [proyectos, setProyectos] = useState<Proyecto[]>([]);
   const [equipoData, setEquipoData] = useState<Personal[]>([]);
   const [restricciones, setRestricciones] = useState<RestriccionesForm[]>([]);
-
   // Inicializar navigate para redireccionar
   const navigate = useNavigate();
 
@@ -66,8 +65,6 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
     }
   };
   
-
-
   // Función para cerrar sesión
   const logout = () => {
     setClienteId(null);
@@ -164,7 +161,7 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
         proyectoId,
         setProyectoId,
         logout,
-        fetchEquipo
+        fetchEquipo,
       }}
     >
       {children}

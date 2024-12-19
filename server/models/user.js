@@ -13,12 +13,16 @@ const userSchema = new mongoose.Schema({
   },
   role: {
     type: String,
-    enum: ["admin", "user"], // Define los roles permitidos
+    enum: ["admin", "user"],
     default: "user",
   },
   access: {
-    clientes: [{ type: mongoose.Schema.Types.ObjectId, ref: "Cliente" }], // Referencia al modelo Cliente
-    proyectos: [{ type: mongoose.Schema.Types.ObjectId, ref: "Proyecto" }], // Referencia al modelo Proyecto
+    clientes: [{ type: mongoose.Schema.Types.ObjectId, ref: "Cliente" }],
+    proyectos: [{ type: mongoose.Schema.Types.ObjectId, ref: "Proyecto" }],
+  },
+  equipo: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "crew", // Nombre del modelo Equipo
   },
 });
 

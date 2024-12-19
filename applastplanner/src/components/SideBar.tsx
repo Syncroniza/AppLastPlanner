@@ -53,9 +53,9 @@ const Sidebar: React.FC = () => {
             <li className="mb-2">
               <button
                 onClick={() => setIsAvanceOpen(!isAvanceOpen)}
-                className="flex items-center p-2 hover:bg-gray-700 rounded w-full text-left"
+                className="flex items-center p-2 hover:bg-gray-700 rounded w-full text-sm text-left"
               >
-                <HiOutlineTrendingUp className="mr-2 text-2xl" /> AVANCE
+                <HiOutlineTrendingUp className="mr-2" /> Avance
               </button>
               {isAvanceOpen && (
                 <ul className="ml-4">
@@ -66,16 +66,16 @@ const Sidebar: React.FC = () => {
                         setIsObraGruesaOpen(!isObraGruesaOpen);
                         setIsTerminacionesOpen(false);
                       }}
-                      className="block p-2 hover:bg-gray-700 rounded w-full text-left text-xs"
+                      className="block p-2 hover:bg-gray-700 rounded w-full text-left text-xs ml-4"
                     >
-                      OBRA GRUESA
+                      Obra Gruesa
                     </button>
                     {isObraGruesaOpen && (
                       <ul className="ml-4">
                         <li className="mb-2">
                           <Link
                             to={proyectoId ? `/proyectos/${proyectoId}/obragruesa/hormigon` : '#'}
-                            className={`block p-2 hover:bg-gray-700 rounded text-xs${
+                            className={`block p-2 hover:bg-gray-700 rounded text-xs ml-2 ${
                               !proyectoId ? 'opacity-50 cursor-not-allowed' : ''
                             }`}
                           >
@@ -85,7 +85,7 @@ const Sidebar: React.FC = () => {
                         <li className="mb-2">
                           <Link
                             to={proyectoId ? `/proyectos/${proyectoId}/obragruesa/curvahormigon` : '#'}
-                            className={`block p-2 hover:bg-gray-700 rounded text-xs${
+                            className={`block p-2 hover:bg-gray-700 rounded text-xs ml-2${
                               !proyectoId ? 'opacity-50 cursor-not-allowed' : ''
                             }`}
                           >
@@ -95,11 +95,11 @@ const Sidebar: React.FC = () => {
                         <li className="mb-2">
                           <Link
                             to={proyectoId ? `/proyectos/${proyectoId}/obragruesa/registrohormigon` : '#'}
-                            className={`block p-2 hover:bg-gray-700 rounded text-xs${
+                            className={`block p-2 hover:bg-gray-700 rounded text-xs ml-2 ${
                               !proyectoId ? 'opacity-50 cursor-not-allowed' : ''
                             }`}
                           >
-                            Registro de Hormigón
+                            Estadisticas de Hormigón
                           </Link>
                         </li>
                       </ul>
@@ -113,16 +113,16 @@ const Sidebar: React.FC = () => {
                         setIsTerminacionesOpen(!isTerminacionesOpen);
                         setIsObraGruesaOpen(false);
                       }}
-                      className="block p-2 hover:bg-gray-700 rounded w-full text-left"
+                      className="block p-2 hover:bg-gray-700 rounded w-full text-left text-xs ml-4"
                     >
-                      TERMINACIONES
+                      Terminaciones
                     </button>
                     {isTerminacionesOpen && (
                       <ul className="ml-4">
                         <li className="mb-2">
                           <Link
                             to={proyectoId ? `/proyectos/${proyectoId}/terminaciones/curvasterminaciones` : '#'}
-                            className={`block p-2 hover:bg-gray-700 rounded ${
+                            className={`block p-2 hover:bg-gray-700 rounded text-xs ml-2 ${
                               !proyectoId ? 'opacity-50 cursor-not-allowed' : ''
                             }`}
                           >
@@ -140,28 +140,28 @@ const Sidebar: React.FC = () => {
             <li className="mb-2">
               <button
                 onClick={() => setIsLastPlannerOpen(!isLastPlannerOpen)}
-                className="flex items-center p-2 hover:bg-gray-700 rounded w-full text-left"
+                className="flex items-center p-2 hover:bg-gray-700 rounded w-full text-left text-sm"
               >
-                <HiOutlineClipboardCheck className="mr-2" /> LAST PLANNER
+                <HiOutlineClipboardCheck className="mr-2 text-sm" /> Last Planner 
               </button>
               {isLastPlannerOpen && (
                 <ul className="ml-4">
                   <li className="mb-2">
                     <button
                       onClick={() => handleSidebarClick('cliente123', 'proyecto456')}
-                      className="block p-2 hover:bg-gray-700 rounded w-full text-left"
+                      className="block p-2 hover:bg-gray-700 rounded w-full text-left text-xs ml-4"
                     >
-                      Clientes/Proyectos
+                      Proyectos 
                     </button>
                   </li>
                   <li className="mb-2">
-                    <Link to="/personal" className="block p-2 hover:bg-gray-700 rounded">
+                    <Link to="/personal" className="block p-2 hover:bg-gray-700 rounded text-xs ml-4">
                       Personal
                     </Link>
                   </li>
                   <li className="mb-2">
-                    <Link to="/ppc" className="block p-2 hover:bg-gray-700 rounded">
-                      PPC
+                    <Link to="/ppc" className="block p-2 hover:bg-gray-700 rounded text-xs ml-4">
+                      Ppc
                     </Link>
                   </li>
                 </ul>
@@ -171,7 +171,7 @@ const Sidebar: React.FC = () => {
           <div className="sidebar mt-4">
             <button
               onClick={logout}
-              className="w-full bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded"
+              className="w-full bg-red-600 hover:bg-red-700 text-white px-3 py-2 rounded text-sm"
             >
               Logout
             </button>

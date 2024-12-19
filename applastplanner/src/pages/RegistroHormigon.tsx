@@ -1,8 +1,8 @@
-import React from 'react'
+
 
 function RegistroHormigon() {
   return (
-    <div>RegistroHormigon</div>
+    <div className=' ml-16 mt-10 text-xl'>Estadisticas de Hormigon... Pagina en Construccion ....</div>
   )
 }
 

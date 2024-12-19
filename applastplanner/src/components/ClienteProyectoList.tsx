@@ -134,13 +134,13 @@ const ClienteProyectoList: React.FC = () => {
 
   return (
     <div className="p-4 bg-slate-100 shadow-md rounded-md w-full ">
-      <h2 className="text-2xl font-bold mb-4">Listado de Clientes y Proyectos</h2>
+      <h2 className="text-xl font-bold mb-4">Listado de Clientes y Proyectos</h2>
     
       <div className="">
         {proyectosVisibles && clientes.length > 0 ? (
           clientes.map((cliente) => ( // Sin llaves adicionales aquí
             <div key={cliente._id} className="p-4 border rounded-md bg-gray-200 shadow-sm mt-4">
-              <h3 className="text-xl text-blue-500 font-semibold">{cliente.nombre}</h3>
+              <h3 className="text-lg text-blue-500 font-semibold">{cliente.nombre}</h3>
               {cliente.proyectos && cliente.proyectos.length > 0 ? (
                 cliente.proyectos.map((proyecto: Proyecto) => {
                   const stats = calculateStats(proyecto._id, cliente._id);
@@ -149,10 +149,10 @@ const ClienteProyectoList: React.FC = () => {
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4" key={proyecto._id}>
                       {/* Columna 1: Proyecto, Descripción y Botones */}
                       <div>
-                        <p className="text-xl font-semibold mb-2">
+                        <p className="text-sm font-semibold mb-2">
                           <strong>Proyecto:</strong> {proyecto.nombre}
                         </p>
-                        <p className="text-lg mb-4">
+                        <p className="text-sm mb-4">
                           <strong>Descripción:</strong> {proyecto.descripcion}
                         </p>
                         <div className="flex space-x-4">
@@ -165,13 +165,13 @@ const ClienteProyectoList: React.FC = () => {
                                 proyecto.nombre
                               )
                             }
-                            className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
+                            className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 text-sm"
                           >
                             Crear Restricciones
                           </button>
                           <button
                             onClick={() => handleCrearPersonal(proyecto._id)}
-                            className="px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600"
+                            className="px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600 text-sm"
                           >
                             Crear Personal
                           </button>
@@ -180,16 +180,16 @@ const ClienteProyectoList: React.FC = () => {
 
                       {/* Columna 2: Estadísticas */}
                       <div className="p-4 bg-gray-100 rounded-md shadow-sm">
-                        <p className="text-lg">
+                        <p className="text-sm">
                           <strong>Total Restricciones:</strong> {stats.total}
                         </p>
-                        <p className="text-lg">
+                        <p className="text-sm">
                           <strong>Abiertas:</strong> {stats.abiertas}
                         </p>
-                        <p className="text-lg">
+                        <p className="text-sm">
                           <strong>Cerradas:</strong> {stats.cerradas}
                         </p>
-                        <p className="text-lg text-red-500 font-bold">
+                        <p className="text-sm text-red-500 font-bold">
                           <strong>Pasadas de Fecha:</strong> {stats.pasadasFecha}
                         </p>
                       </div>

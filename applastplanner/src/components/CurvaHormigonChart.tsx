@@ -98,14 +98,14 @@ const CurvaHormigonChart = () => {
         margin={{ top: 50, right: 110, bottom: 110, left: 60 }}
         xScale={{
           type: "time",
-          format: "%Y-%m-%d", // Formato de fecha
+          format: "%Y-%m-%d",
           useUTC: false,
           precision: "day",
         }}
-        yScale={{ type: "linear", min: "auto", max: "auto", stacked: false, reverse: false }}
+        yScale={{ type: "linear", min: "auto", max: "auto", stacked: false }}
         axisBottom={{
-          format: "%d/%m/%y", // Mostrar fechas como día/mes/año
-          tickValues: "every 1 week", // Un tick para cada semana
+          format: "%d/%m/%y",
+          tickValues: "every 1 week",
           tickSize: 5,
           tickPadding: 5,
           tickRotation: -45,
@@ -116,7 +116,6 @@ const CurvaHormigonChart = () => {
         axisLeft={{
           tickSize: 5,
           tickPadding: 5,
-          tickRotation: 0,
           legend: "Hormigón Acumulado (m³)",
           legendOffset: -50,
           legendPosition: "middle",
@@ -126,30 +125,63 @@ const CurvaHormigonChart = () => {
         pointBorderWidth={2}
         pointBorderColor={{ from: "serieColor" }}
         useMesh={true}
+        tooltip={({ point }) => {
+          // Función para formatear fecha a dd/mm/yy
+          const formatDate = (date: DatumValue): string => {
+            const parsedDate = new Date(date as string | number | Date);
+            if (isNaN(parsedDate.getTime())) return "Fecha inválida";
+            return new Intl.DateTimeFormat("es-ES", {
+              day: "2-digit",
+              month: "2-digit",
+              year: "2-digit",
+            }).format(parsedDate);
+          };
+        
+          // Fecha formateada
+          const pointDate = formatDate(point.data.x);
+          // Valor actual de la serie
+          const hgValue = Number(point.data.y);
+        
+          // Buscar otra serie con la misma fecha
+          const otherSeries = dataForChart.find((series) => series.id !== point.serieId);
+          const otherPoint = otherSeries?.data.find(
+            (p) => new Date(p.x as string).getTime() === new Date(point.data.x as string).getTime()
+          );
+        
+          const otherValue = otherPoint ? Number(otherPoint.y) : null;
+        
+          return (
+            <div
+              style={{
+                background: "white",
+                padding: "10px",
+                border: "1px solid #ccc",
+                borderRadius: "4px",
+              }}
+            >
+              <strong>Fecha: {pointDate}</strong>
+              <div style={{ color: point.color }}>
+                {point.serieId}: {hgValue} m³
+              </div>
+              {otherPoint && (
+                <div style={{ color: "gray" }}>
+                  {otherSeries?.id}: {otherValue} m³
+                </div>
+              )}
+            </div>
+          );
+        }}
         legends={[
           {
             anchor: "bottom-right",
             direction: "column",
-            justify: false,
             translateX: 80,
-            translateY: 0,
             itemsSpacing: 2,
-            itemDirection: "left-to-right",
             itemWidth: 90,
             itemHeight: 20,
             itemOpacity: 0.75,
             symbolSize: 10,
             symbolShape: "circle",
-            symbolBorderColor: "rgba(0, 0, 0, .5)",
-            effects: [
-              {
-                on: "hover",
-                style: {
-                  itemBackground: "rgba(0, 0, 0, .03)",
-                  itemOpacity: 1,
-                },
-              },
-            ],
           },
         ]}
       />

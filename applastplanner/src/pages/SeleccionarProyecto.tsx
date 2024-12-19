@@ -3,14 +3,12 @@ import { useAppContext } from '../components/Context';
 import { useNavigate } from 'react-router-dom';
 
 const SeleccionarProyecto: React.FC = () => {
-    const { proyectos, setClienteId, setProyectoId, fetchProyectos } = useAppContext();
+    const { proyectos, setProyectoId, setClienteId, fetchProyectos } = useAppContext();
     const [proyectoSeleccionado, setProyectoSeleccionado] = useState<string>('');
     const navigate = useNavigate();
 
     useEffect(() => {
-        // Si no se han cargado los proyectos, puedes llamarlos aquí
-        // o si ya se cargan en AppProvider no hace falta.
-        fetchProyectos();
+        fetchProyectos(); // Carga los proyectos al montar el componente
     }, [fetchProyectos]);
 
     const handleChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
@@ -23,25 +21,20 @@ const SeleccionarProyecto: React.FC = () => {
             return;
         }
 
-        // Encontrar el proyecto seleccionado
-        const proyecto = proyectos.find(p => p._id === proyectoSeleccionado);
-        if (!proyecto) {
-            alert('Proyecto no encontrado.');
-            return;
-        }
+        // Encuentra el proyecto seleccionado
+        const proyecto = proyectos.find((p) => p._id === proyectoSeleccionado);
 
-        // Establecer proyectoId
-        setProyectoId(proyecto._id);
-
-        // Verificar tipo de cliente
-        if (proyecto.cliente && typeof proyecto.cliente !== 'string') {
-            setClienteId(proyecto.cliente._id);
+        if (proyecto) {
+            setProyectoId(proyecto._id); // Establece el proyectoId en el contexto
+            if (proyecto.cliente && proyecto.cliente._id) {
+                setClienteId(proyecto.cliente._id); // Establece el clienteId desde proyecto.cliente
+            } else {
+                console.error('El cliente asociado al proyecto no tiene un ID válido.');
+            }
+            navigate('/home'); // Redirige al home
         } else {
-            setClienteId(null);
+            alert('El proyecto seleccionado no es válido.');
         }
-
-        // Redirigir a home
-        navigate('/home');
     };
 
     return (
@@ -56,7 +49,7 @@ const SeleccionarProyecto: React.FC = () => {
                     <option value="">-- Selecciona un proyecto --</option>
                     {proyectos.map((proyecto) => (
                         <option key={proyecto._id} value={proyecto._id}>
-                            {proyecto.nombre}
+                            {proyecto.nombre} ({proyecto.cliente.nombre})
                         </option>
                     ))}
                 </select>
