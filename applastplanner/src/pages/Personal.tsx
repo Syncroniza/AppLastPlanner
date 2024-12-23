@@ -33,7 +33,7 @@ const PersonalTable: React.FC = () => {
 
   return (
     <div className="p-4">
-      <h1 className="text-3xl font-bold mb-4">LISTADO DE PERSONAL</h1>
+      <h1 className="text-lg ml-1 mt-2 font-bold mb-4">LISTADO DE PERSONAL</h1>
       <PersonalForm />
 
       {equipoData.length === 0 ? (
@@ -41,45 +41,45 @@ const PersonalTable: React.FC = () => {
       ) : (
         <div className="overflow-x-auto">
           <table className="min-w-full border border-gray-200 divide-y divide-gray-200 mt-4">
-            <thead className="bg-gray-100">
+            <thead className="bg-gray-100 text-xs">
               <tr>
-                <th className="px-4 py-2 text-center text-sm border-b border-gray-300">ID</th>
-                <th className="px-4 py-2 text-center text-sm border-b border-gray-300">Nombre</th>
-                <th className="px-4 py-2 text-center text-sm border-b border-gray-300">Apellido</th>
-                <th className="px-4 py-2 text-center text-sm border-b border-gray-300">
+                <th className="px-4 py-2 text-center text-xs border-b border-gray-300">ID</th>
+                <th className="px-4 py-2 text-center text-xs border-b border-gray-300">Nombre</th>
+                <th className="px-4 py-2 text-center text-xs border-b border-gray-300">Apellido</th>
+                <th className="px-4 py-2 text-center text-xs border-b border-gray-300">
                   Empresa Subcontratista
                 </th>
-                <th className="px-4 py-2 text-center text-sm border-b border-gray-300">Correo</th>
-                <th className="px-4 py-2 text-center text-sm border-b border-gray-300">Cargo</th>
-                <th className="px-4 py-2 text-center text-sm border-b border-gray-300">Cliente</th>
-                <th className="px-4 py-2 text-center text-sm border-b border-gray-300">Proyecto</th>
+                <th className="px-4 py-2 text-center text-xs border-b border-gray-300">Correo</th>
+                <th className="px-4 py-2 text-center text-xs border-b border-gray-300">Cargo</th>
+                <th className="px-4 py-2 text-center text-xs border-b border-gray-300">Cliente</th>
+                <th className="px-4 py-2 text-center text-xs border-b border-gray-300">Proyecto</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-200">
               {equipoData.map((personal, index) => (
                 <tr key={personal._id || index} className="hover:bg-gray-50">
-                  <td className="px-4 py-2 text-center text-sm border-r border-gray-300 whitespace-nowrap">
+                  <td className="px-4 py-1 text-center text-xs border-r border-gray-300 whitespace-nowrap">
                     {index + 1}
                   </td>
-                  <td className="px-4 py-2 text-center text-sm border-r border-gray-300 whitespace-nowrap">
+                  <td className="px-4 py-1 text-center text-xs border-r border-gray-300 whitespace-nowrap">
                     {personal.nombre}
                   </td>
-                  <td className="px-4 py-2 text-center text-sm border-r border-gray-300 whitespace-nowrap">
+                  <td className="px-4 py-1 text-center text-xs border-r border-gray-300 whitespace-nowrap">
                     {personal.apellido}
                   </td>
-                  <td className="px-4 py-2 text-center text-sm border-r border-gray-300 whitespace-nowrap">
+                  <td className="px-4 py-1 text-center text-xs border-r border-gray-300 whitespace-nowrap">
                     {personal.empresa}
                   </td>
-                  <td className="px-4 py-2 text-center text-sm border-r border-gray-300 whitespace-nowrap">
+                  <td className="px-4 py-1 text-center text-xs border-r border-gray-300 whitespace-nowrap">
                     {personal.correo}
                   </td>
-                  <td className="px-4 py-2 text-center text-sm border-r border-gray-300 whitespace-nowrap">
+                  <td className="px-4 py-1 text-center text-xs border-r border-gray-300 whitespace-nowrap">
                     {personal.cargo}
                   </td>
-                  <td className="px-4 py-2 text-center text-sm border-r border-gray-300 whitespace-nowrap">
+                  <td className="px-4 py-1 text-center text-xs border-r border-gray-300 whitespace-nowrap">
                     {personal.cliente ? personal.cliente.nombre : "Sin cliente"}
                   </td>
-                  <td className="px-4 py-2 text-center text-sm whitespace-nowrap">
+                  <td className="px-4 py-1 text-center text-xs whitespace-nowrap">
                     {personal.proyecto ? personal.proyecto.nombre : "Sin proyecto"}
                   </td>
                 </tr>

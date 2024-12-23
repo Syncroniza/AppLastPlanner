@@ -1,22 +1,12 @@
 import React, { useEffect, useState } from 'react';
-import { Pie } from 'react-chartjs-2';
+import { ResponsivePie } from '@nivo/pie';
 import { useAppContext } from './Context'; // Asegúrate de que esta ruta sea correcta
-import {
-  Chart as ChartJS,
-  ArcElement,
-  Tooltip,
-  Legend,
-} from 'chart.js';
-
-// Registrar los elementos de Chart.js
-ChartJS.register(ArcElement, Tooltip, Legend);
 
 const GraficoRestricciones: React.FC = () => {
   const { getRestriccionesByProyecto, proyectoId, clienteId } = useAppContext();
   const [restriccionesFiltradas, setRestriccionesFiltradas] = useState<any[]>([]);
 
   console.log('Restricciones para el gráfico:', restriccionesFiltradas);
-  
 
   // Obtener las restricciones filtradas desde el contexto
   useEffect(() => {
@@ -27,7 +17,6 @@ const GraficoRestricciones: React.FC = () => {
       console.warn('No se encontró proyectoId para filtrar restricciones en el gráfico');
     }
   }, [proyectoId, clienteId, getRestriccionesByProyecto]);
-
 
   // Verificar si restriccionesFiltradas es válida y no está vacía
   if (!restriccionesFiltradas || restriccionesFiltradas.length === 0) {
@@ -46,22 +35,56 @@ const GraficoRestricciones: React.FC = () => {
   const total = abiertas + cerradas;
 
   // Datos para el gráfico de torta
-  const data = {
-    labels: ['Abiertas', 'Cerradas'],
-    datasets: [
-      {
-        label: 'Estado de Restricciones',
-        data: [abiertas, cerradas],
-        backgroundColor: ['#FF6384', '#36A2EB'],
-        hoverBackgroundColor: ['#FF6384', '#36A2EB'],
-      },
-    ],
-  };
+  const pieData = [
+    { id: 'Abiertas', label: 'Abiertas', value: abiertas, color: '#FF6384' },
+    { id: 'Cerradas', label: 'Cerradas', value: cerradas, color: '#36A2EB' },
+  ];
 
   return (
     <div style={{ width: '80%', margin: '0 auto' }}>
       <p className="mt-4 text-xl font-semibold text-center">Total de restricciones: {total}</p>
-      <Pie data={data} />
+      <div style={{ height: 400 }}>
+        <ResponsivePie
+          data={pieData}
+          margin={{ top: 40, right: 80, bottom: 80, left: 80 }}
+          innerRadius={0.5}
+          padAngle={0.7}
+          cornerRadius={3}
+          colors={{ datum: 'data.color' }}
+          borderWidth={1}
+          borderColor={{ from: 'color', modifiers: [['darker', 0.2]] }}
+          radialLabelsSkipAngle={10}
+          radialLabelsTextColor="#333333"
+          radialLabelsLinkColor={{ from: 'color' }}
+          sliceLabelsSkipAngle={10}
+          sliceLabelsTextColor="#333333"
+          legends={[
+            {
+              anchor: 'bottom',
+              direction: 'row',
+              justify: false,
+              translateX: 0,
+              translateY: 56,
+              itemsSpacing: 0,
+              itemWidth: 100,
+              itemHeight: 18,
+              itemTextColor: '#999',
+              itemDirection: 'left-to-right',
+              itemOpacity: 1,
+              symbolSize: 18,
+              symbolShape: 'circle',
+              effects: [
+                {
+                  on: 'hover',
+                  style: {
+                    itemTextColor: '#000',
+                  },
+                },
+              ],
+            },
+          ]}
+        />
+      </div>
     </div>
   );
 };

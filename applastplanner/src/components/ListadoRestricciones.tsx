@@ -13,7 +13,6 @@ const ListadoRestricciones: React.FC = () => {
   const location = useLocation();
   const { clienteId, proyectoId } = location.state || {}; // Extrae clienteId y proyectoId del estado
   const [filteredRestricciones, setFilteredRestricciones] = useState<RestriccionesForm[]>([]);
-  console.log("filteredRestricciones", filteredRestricciones)
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedRestriccion, setSelectedRestriccion] = useState<RestriccionesForm | null>(null);
   const [sortConfig, setSortConfig] = useState<{ key: string; direction: 'asc' | 'desc' } | null>(null);
@@ -57,9 +56,19 @@ const ListadoRestricciones: React.FC = () => {
         const dateA = new Date(a[sortConfig.key as keyof RestriccionesForm] as string);
         const dateB = new Date(b[sortConfig.key as keyof RestriccionesForm] as string);
         return sortConfig.direction === 'asc' ? dateA.getTime() - dateB.getTime() : dateB.getTime() - dateA.getTime();
+      } else if (sortConfig.key === 'responsable') {
+        const valueA =
+          typeof a.responsable === 'object' && a.responsable !== null
+            ? `${a.responsable.nombre || ''} ${a.responsable.apellido || ''}`.toLowerCase()
+            : (a.responsable || '').toString().toLowerCase();
+        const valueB =
+          typeof b.responsable === 'object' && b.responsable !== null
+            ? `${b.responsable.nombre || ''} ${b.responsable.apellido || ''}`.toLowerCase()
+            : (b.responsable || '').toString().toLowerCase();
+        return sortConfig.direction === 'asc' ? valueA.localeCompare(valueB) : valueB.localeCompare(valueA);
       } else {
-        const valueA = (a[sortConfig.key as keyof RestriccionesForm] as string).toLowerCase();
-        const valueB = (b[sortConfig.key as keyof RestriccionesForm] as string).toLowerCase();
+        const valueA = (a[sortConfig.key as keyof RestriccionesForm] || '').toString().toLowerCase();
+        const valueB = (b[sortConfig.key as keyof RestriccionesForm] || '').toString().toLowerCase();
         return sortConfig.direction === 'asc' ? valueA.localeCompare(valueB) : valueB.localeCompare(valueA);
       }
     });
@@ -136,13 +145,13 @@ const ListadoRestricciones: React.FC = () => {
   console.log("Contenido de sortedRestricciones:", sortedRestricciones);
   return (
     <div className="overflow-x-auto mt-4">
-      <h1 className="text-3xl font-bold mb-4">LISTADO DE RESTRICCIONES</h1>
       <button
         onClick={handleExportToExcel}
-        className="mb-4 bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600"
+        className="mb-4 bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600 text-sm"
       >
         Exportar a Excel
       </button>
+      <h1 className="text-sm font-bold mb-4">LISTADO DE RESTRICCIONES</h1>
 
       {updateMessage && (
         <div className="mb-4 p-2 text-white bg-green-500 rounded flex items-center">
@@ -154,76 +163,74 @@ const ListadoRestricciones: React.FC = () => {
           )}
         </div>
       )}
-
-
       <table className="min-w-full bg-white border border-gray-200">
         <thead>
           <tr className="bg-gray-100">
-            <th className="px-4 py-2 border-b">Cerrar restriccion</th>
-            <th onClick={() => handleSort('responsable')} className="px-4 py-2 border-b cursor-pointer">
+            <th className="px-4 py-2 border-b text-xs">Cerrar restriccion</th>
+            <th onClick={() => handleSort('responsable')} className="px-4 py-2 border-b cursor-pointer text-xs">
               Responsable {sortConfig?.key === 'responsable' ? (sortConfig.direction === 'asc' ? '↑' : '↓') : ''}
             </th>
-            <th onClick={() => handleSort('compromiso')} className="px-4 py-2 border-b cursor-pointer">
+            <th onClick={() => handleSort('compromiso')} className="px-4 py-2 border-b cursor-pointer text-xs">
               Compromiso {sortConfig?.key === 'compromiso' ? (sortConfig.direction === 'asc' ? '↑' : '↓') : ''}
             </th>
-            <th className="px-4 py-2 border-b">Centro de Costo</th>
-            <th onClick={() => handleSort('fechacreacion')} className="px-4 py-2 border-b cursor-pointer">
+            <th className="px-4 py-2 border-b text-xs">Centro de Costo</th>
+            <th onClick={() => handleSort('fechacreacion')} className="px-4 py-2 border-b cursor-pointer text-xs">
               Fecha de Creación {sortConfig?.key === 'fechacreacion' ? (sortConfig.direction === 'asc' ? '↑' : '↓') : ''}
             </th>
-            <th onClick={() => handleSort('fechacompromiso')} className="px-4 py-2 border-b cursor-pointer">
+            <th onClick={() => handleSort('fechacompromiso')} className="px-4 py-2 border-b cursor-pointer text-xs">
               Fecha de Compromiso {sortConfig?.key === 'fechacompromiso' ? (sortConfig.direction === 'asc' ? '↑' : '↓') : ''}
             </th>
-            <th onClick={() => handleSort('nuevafecha')} className="px-4 py-2 border-b cursor-pointer">
+            <th onClick={() => handleSort('nuevafecha')} className="px-4 py-2 border-b cursor-pointer text-xs">
               Fecha de Cierre {sortConfig?.key === 'nuevafecha' ? (sortConfig.direction === 'asc' ? '↑' : '↓') : ''}
             </th>
-            <th className="px-4 py-2 border-b">Status</th>
-            <th className="px-4 py-2 border-b">Acciones</th>
+            <th className="px-4 py-2 border-b text-xs">Status</th>
+            <th className="px-4 py-2 border-b text-xs">Acciones</th>
           </tr>
         </thead>
         <tbody>
           {sortedRestricciones.length > 0 ? (
             sortedRestricciones.map((restriccion) => (
               <tr key={restriccion._id} className="hover:bg-gray-50">
-                <td className="px-4 py-2 border-b text-center">
+                <td className="px-4 py-2 border-b text-center text-xs">
                   <button
                     onClick={() => handleCheckboxChange(restriccion)}
                     disabled={restriccion.status === 'cerrada'} // Deshabilita si ya está cerrada
-                    className={`px-4 py-2 text-white font-semibold rounded ${restriccion.status === 'cerrada'
-                      ? 'bg-gray-400 cursor-not-allowed'
+                    className={`px-4 py-1 text-white font-semibold rounded ${restriccion.status === 'cerrada'
+                      ? 'bg-gray-300 cursor-not-allowed'
                       : 'bg-red-500 hover:bg-red-600'
                       }`}
                   >
                     {restriccion.status === 'cerrada' ? 'Cerrada' : 'Cerrar'}
                   </button>
                 </td>
-                <td className="px-4 py-2 border-b">
+                <td className="px-4 py-1 border-b text-xs">
                   {typeof restriccion.responsable === 'object' && restriccion.responsable !== null
                     ? `${restriccion.responsable.nombre} ${restriccion.responsable.apellido}`
                     : restriccion.responsable || 'No asignado'}
                 </td>
 
-                <td className="px-4 py-2 border-b">{restriccion.compromiso}</td>
-                <td className="px-4 py-2 border-b">{restriccion.centrocosto}</td>
-                <td className="py-2">
+                <td className="px-4 py-1 border-b text-xs">{restriccion.compromiso}</td>
+                <td className="px-4 py-1 border-b text-xs text-center">{restriccion.centrocosto}</td>
+                <td className="py-1 text-xs text-center">
                   {restriccion.fechacreacion
                     ? format(addDays(new Date(restriccion.fechacreacion), 1), 'dd/MM/yyyy')
                     : ''}
                 </td>
-                <td className="py-2">
+                <td className="py-1 text-xs text-center">
                   {restriccion.fechacompromiso
                     ? format(addDays(new Date(restriccion.fechacompromiso), 1), 'dd/MM/yyyy')
                     : ''}
                 </td>
-                <td className="px-4 py-2 border-b">
+                <td className="px-4 py-1 text-xs text-center border-b">
                   {restriccion.nuevafecha
                     ? new Date(restriccion.nuevafecha).toLocaleDateString('es-ES')
                     : 'N/A'}
                 </td>
-                <td className="px-4 py-2 border-b">{restriccion.status}</td>
-                <td className="px-4 py-2 border-b">
+                <td className="px-4 py-1 text-xs text-center border-b">{restriccion.status}</td>
+                <td className="px-4 py-1 text-xs text-center border-b">
                   <button
                     onClick={() => handleEditClick(restriccion)}
-                    className="bg-blue-500 text-white px-2 py-1 rounded hover:bg-blue-600"
+                    className="bg-green-500 text-white px-4 py-1 text-xs rounded hover:bg-blue-600"
                   >
                     Editar
                   </button>

@@ -96,7 +96,7 @@ const FormularioEquipo: React.FC = () => {
         className="flex flex-wrap gap-4 bg-gray-100 rounded-lg mt-2 p-6"
       >
         <div className="flex-1">
-          <label htmlFor="nombre" className="block font-medium mb-1">
+          <label htmlFor="nombre" className="block font-medium mb-1 text-xs">
             Nombre:
           </label>
           <input
@@ -106,11 +106,11 @@ const FormularioEquipo: React.FC = () => {
             value={formData.nombre}
             onChange={handleChange}
             required
-            className="w-full border p-2 rounded ml-2"
+            className="w-full border p-2 rounded ml-2 text-xs"
           />
         </div>
         <div className="flex-1">
-          <label htmlFor="apellido" className="block font-medium mb-1">
+          <label htmlFor="apellido" className="block font-medium mb-1 text-xs">
             Apellido:
           </label>
           <input
@@ -120,10 +120,10 @@ const FormularioEquipo: React.FC = () => {
             value={formData.apellido}
             onChange={handleChange}
             required
-            className="w-full border p-2 rounded"
+            className="w-full border p-2 rounded text-xs"
           />
         </div>
-        <div className="flex-1">
+        <div className="flex-1 text-xs">
           <label htmlFor="empresa" className="block font-medium mb-1">
             Empresa:
           </label>
@@ -134,11 +134,11 @@ const FormularioEquipo: React.FC = () => {
             value={formData.empresa}
             onChange={handleChange}
             required
-            className="w-full border p-2 rounded"
+            className="w-full border p-2 rounded text-xs"
           />
         </div>
         <div className="flex-1">
-          <label htmlFor="correo" className="block font-medium mb-1">
+          <label htmlFor="correo" className="block font-medium mb-1 text-xs">
             Correo:
           </label>
           <input
@@ -148,11 +148,11 @@ const FormularioEquipo: React.FC = () => {
             value={formData.correo}
             onChange={handleChange}
             required
-            className="w-full border p-2 rounded"
+            className="w-full border p-2 rounded text-xs"
           />
         </div>
         <div className="flex-1">
-          <label htmlFor="cargo" className="block font-medium mb-1">
+          <label htmlFor="cargo" className="block font-medium mb-1 text-xs">
             Cargo:
           </label>
           <input
@@ -162,11 +162,11 @@ const FormularioEquipo: React.FC = () => {
             value={formData.cargo}
             onChange={handleChange}
             required
-            className="w-full border p-2 rounded"
+            className="w-full border p-2 rounded text-xs"
           />
         </div>
-        <div className="flex-1">
-          <label htmlFor="cliente" className="block font-medium mb-1">
+        <div className="flex-1 text-xs">
+          <label htmlFor="cliente" className="block font-medium mb-1 text-xs">
             Cliente:
           </label>
           <select
@@ -175,7 +175,7 @@ const FormularioEquipo: React.FC = () => {
             value={formData.cliente}
             onChange={handleChange}
             required
-            className="w-full border p-2 rounded"
+            className="w-full border p-2 rounded text-xs"
           >
             <option value="">Seleccione un cliente</option>
             {clientes.map((cliente) => (
@@ -185,7 +185,7 @@ const FormularioEquipo: React.FC = () => {
             ))}
           </select>
         </div>
-        <div className="flex-1 mr-2">
+        <div className="flex-1 mr-2 text-xs">
           <label htmlFor="proyecto" className="block font-medium mb-1 mr-2">
             Proyecto:
           </label>
@@ -195,7 +195,7 @@ const FormularioEquipo: React.FC = () => {
             value={formData.proyecto}
             onChange={handleChange}
             required
-            className="w-full border p-2 rounded mr-2"
+            className="w-full border p-2 rounded mr-2 text-xs"
           >
             <option value="">Seleccione un proyecto</option>
             {proyectos.map((proyecto) => (
@@ -205,10 +205,10 @@ const FormularioEquipo: React.FC = () => {
             ))}
           </select>
         </div>
-        <div className="w-full mt-4 p-2">
+        <div className="w-full mt-4 p-2 text-xs">
           <button
             type="submit"
-            className={`bg-blue-500 text-white py-2 px-4 mt-4 rounded hover:bg-blue-600 w-full ${
+            className={`bg-green-500 text-white py-2 px-4 rounded hover:bg-green-600 w-full  text-xs${
               loading ? "opacity-50 cursor-not-allowed" : ""
             }`}
             disabled={loading}

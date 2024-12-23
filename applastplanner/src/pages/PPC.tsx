@@ -16,7 +16,7 @@ const formatDate = (dateString: string) => {
 };
 
 const PageWithPDF: React.FC = () => {
-  const { clienteId, proyectoId, getRestriccionesByProyecto,proyectos } = useAppContext();
+  const { clienteId, proyectoId, getRestriccionesByProyecto, proyectos } = useAppContext();
   console.log("clienteId", clienteId)
   const [restriccionesFiltradas, setRestriccionesFiltradas] = useState<RestriccionesForm[]>([]);
   const fechaGeneracion = formatDate(new Date().toISOString());
@@ -67,7 +67,6 @@ const PageWithPDF: React.FC = () => {
       >
         Descargar PDF
       </button>
-
       <div id="pdf-content" className="w-full  p-4 bg-white shadow-md rounded-lg">
         <h1 className="text-3xl font-bold text-center mb-6">Informe de Restricciones</h1>
         <p className="text-center text-sm mb-6">
@@ -79,61 +78,64 @@ const PageWithPDF: React.FC = () => {
 
         {/* Contenedor de los gráficos centrados */}
         <div className="flex flex-col items-center mb-6 space-y-6">
-          <div className="w-full max-w-md">
+          <div className="w-full h-auto">
             <GraficoRestricciones />
           </div>
-          <div className="w-full max-w-md">
+          <div>
+      <div></div>
+          </div>
+          <div className="w-full h-96">
             <ResumenRestriccionesPorResponsable />
           </div>
         </div>
 
-        <h2 className="text-2xl font-semibold mb-4 text-center">Listado de Restricciones</h2>
-        {restriccionesFiltradas.length > 0 ? (
-          <div className="overflow-x-auto w-full">
-            <table className="min-w-full border-collapse border border-gray-300 divide-y divide-gray-300">
-              <thead className="bg-gray-200">
-                <tr>
-                  <th className="px-6 py-3 text-left text-sm font-medium text-gray-700">Responsable</th>
-                  <th className="px-6 py-3 text-left text-sm font-medium text-gray-700">Restricción</th>
-                  <th className="px-6 py-3 text-left text-sm font-medium text-gray-700">Fecha de Creación</th>
-                  <th className="px-6 py-3 text-left text-sm font-medium text-gray-700">Fecha Compromiso</th>
-                  <th className="px-6 py-3 text-left text-sm font-medium text-gray-700">Status</th>
-                  <th className="px-6 py-3 text-left text-sm font-medium text-gray-700">CNC</th>
-                  <th className="px-6 py-3 text-left text-sm font-medium text-gray-700">Nueva Fecha</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-gray-300">
-                {restriccionesFiltradas.map((restriccion: RestriccionesForm) => (
-                  <tr
-                    key={restriccion._id}
-                    className="odd:bg-gray-100 even:bg-white hover:bg-gray-200"
-                  >
-                    <td className="px-6 py-3">
-                      {typeof restriccion.responsable === 'object' && restriccion.responsable !== null
-                        ? `${restriccion.responsable.nombre} ${restriccion.responsable.apellido}`
-                        : 'No asignado'}
-                    </td>
-                    <td className="px-6 py-3">{restriccion.compromiso}</td>
-                    <td className="px-6 py-3">
-                      {formatDate(restriccion.fechacreacion)}
-                    </td>
-                    <td className="px-6 py-3">
-                      {formatDate(restriccion.fechacompromiso)}
-                    </td>
-                    <td className="px-6 py-3">{restriccion.status}</td>
-                    <td className="px-6 py-3">{restriccion.cnc}</td>
-                    <td className="px-6 py-3">
-                      {restriccion.nuevafecha ? formatDate(restriccion.nuevafecha) : 'N/A'}
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
+            <h2 className="text-2xl font-semibold  mb-4 mt-48 text-center">Listado de Restricciones</h2>
+            {restriccionesFiltradas.length > 0 ? (
+              <div className="w-full h-auto">
+                <table className="min-w-full border-collapse border border-gray-300 divide-y divide-gray-300">
+                  <thead className="bg-gray-200">
+                    <tr>
+                      <th className="px-6 py-3 text-left text-sm font-medium text-gray-700">Responsable</th>
+                      <th className="px-6 py-3 text-left text-sm font-medium text-gray-700">Restricción</th>
+                      <th className="px-6 py-3 text-left text-sm font-medium text-gray-700">Fecha de Creación</th>
+                      <th className="px-6 py-3 text-left text-sm font-medium text-gray-700">Fecha Compromiso</th>
+                      <th className="px-6 py-3 text-left text-sm font-medium text-gray-700">Status</th>
+                      <th className="px-6 py-3 text-left text-sm font-medium text-gray-700">CNC</th>
+                      <th className="px-6 py-3 text-left text-sm font-medium text-gray-700">Nueva Fecha</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-gray-300">
+                    {restriccionesFiltradas.map((restriccion: RestriccionesForm) => (
+                      <tr
+                        key={restriccion._id}
+                        className="odd:bg-gray-100 even:bg-white hover:bg-gray-200"
+                      >
+                        <td className="px-6 py-3">
+                          {typeof restriccion.responsable === 'object' && restriccion.responsable !== null
+                            ? `${restriccion.responsable.nombre} ${restriccion.responsable.apellido}`
+                            : 'No asignado'}
+                        </td>
+                        <td className="px-6 py-3">{restriccion.compromiso}</td>
+                        <td className="px-6 py-3">
+                          {formatDate(restriccion.fechacreacion)}
+                        </td>
+                        <td className="px-6 py-3">
+                          {formatDate(restriccion.fechacompromiso)}
+                        </td>
+                        <td className="px-6 py-3">{restriccion.status}</td>
+                        <td className="px-6 py-3">{restriccion.cnc}</td>
+                        <td className="px-6 py-3">
+                          {restriccion.nuevafecha ? formatDate(restriccion.nuevafecha) : 'N/A'}
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            ) : (
+              <p className="text-center">No hay restricciones disponibles.</p>
+            )}
           </div>
-        ) : (
-          <p className="text-center">No hay restricciones disponibles.</p>
-        )}
-      </div>
     </div>
   );
 };
